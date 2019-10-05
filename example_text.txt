@@ -1,0 +1,19 @@
+*NOC Handover 2019-09-26* -- Daily digest of major incidents and other important change-of-shift noticies.
+
+
+*Handover Ticket*:
+NP-12
+https://birdco.atlassian.net/browse/NP-12 
+
+*Incidents*:
+NP-10 Status: OPEN
+https://birdco.atlassian.net/browse/NP-10
+
+NP-99 Status: CLOSED
+https://birdco.atlassian.net/browse/NP-99
+
+NP-999 Status: OPEN
+https://birdco.atlassian.net/browse/NP-999
+
+*Important Notes*:
+_Off-going techs, please make any necessary modifications and add important notes for on-coming NOC technicians._
