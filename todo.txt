@@ -1,0 +1,7 @@
+Upcoming/Possible ideas:
+
+-Use Vault API for secrets
+-In addition to P1/P2, include issues containing a certain label `noc-handover`
+-Exclusively include issues containing a certain label
+-Send periodic or triggered updates to slack channel when handover ticket is modified, such as when important notes are added for on-coming NOC techs
+
