@@ -1,14 +1,12 @@
-import os
 import requests
 import json
-
-WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
+from settings import *
 
 
 def send_handover_msg(issue):
     """Expects a valid jira issue to provide relevant info"""
     msg = (
-        f'{issue.fields.summary}\n'
+        f'*{issue.fields.summary}*\n'
         f'{issue.permalink()}\n\n'
         f'{issue.fields.description}')
 

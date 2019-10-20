@@ -1,4 +1,10 @@
 FROM python:3
-ADD handover_bot.py /
-RUN pip install -r requirements.txt
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
 CMD [ "python", "./handover_bot.py" ]
