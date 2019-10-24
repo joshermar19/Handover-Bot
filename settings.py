@@ -8,7 +8,7 @@ ATLASSIAN_URL = 'https://birdco.atlassian.net/'
 JIRA_USER = os.environ.get('JIRA_USER')
 JIRA_KEY = os.environ.get('JIRA_TOKEN')
 
-JIRA_PROJECT = 'NP'  # Use 'NP' for DEBUG
+JIRA_PROJECT = 'NOC'  # Use 'NP' for DEBUG
 
 WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
 
