@@ -6,9 +6,10 @@ from settings import *
 def send_handover_msg(issue):
     """Expects a valid jira issue to provide relevant info"""
     msg = (
+        '@here\n'
         f'*{issue.fields.summary}*\n'
-        f'{issue.permalink()}\n\n'
-        f'{issue.fields.description}')
+        f'{issue.permalink()}\n'
+        f'{issue.fields.description}\n')
 
     slack_msg = {'text': msg}
     requests.post(WHOOK_URL, data=json.dumps(slack_msg))

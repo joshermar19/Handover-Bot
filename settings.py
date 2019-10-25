@@ -1,19 +1,24 @@
-from pytz import timezone
 import os
 
-TZ = timezone('America/Los_Angeles')
-
+# Where dat jira at!?
 ATLASSIAN_URL = 'https://birdco.atlassian.net/'
+JIRA_PROJECT = 'NP'  # Use 'NP' for debug 'NOC' for production
 
+# Secrets
+WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
 JIRA_USER = os.environ.get('JIRA_USER')
 JIRA_KEY = os.environ.get('JIRA_TOKEN')
 
-JIRA_PROJECT = 'NOC'  # Use 'NP' for DEBUG
+# For internal use as macros for queries
+_BASE = 'project = NOC AND type = Incident'
+_SORT = 'ORDER BY key DESC'
 
-WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
+# JQL queries used to populate the different sections with relevant issues
+P1_QUERY = f'{_BASE} AND priority = 1 AND created > "-36h" {_SORT}'
+P2_QUERY = f'{_BASE} AND priority = 2 AND status != Closed {_SORT}'
+OTHER_QUERY = f'{_BASE} AND priority < 2 AND status != Closed {_SORT}'
 
-HIGHPR_QUERY = ('project = NOC AND created > "-36h" AND '  # CHOSE APPROPRIATE TIME!
-                '(priority =  1 OR priority = 2) ORDER BY key DESC')
-
-OUTSTD_QUERY = ('project = NOC AND type = Incident AND '
-                'status != Closed AND created >= "-7d" ORDER BY key DESC')
+# These mesages will appear in lieu of relevant issues
+NO_P1_TEXT = '_No outages to show for the past 36 hrs._\n\n'
+NO_P2_TEXT = '_There are no outstanding P2 issues!_\n\n'
+NO_OTHER_TEXT = '_There are no outstanding P3-P5 issues!_\n\n'
