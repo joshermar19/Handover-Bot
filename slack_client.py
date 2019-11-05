@@ -1,5 +1,9 @@
-from settings import *
+"""This is not currently in use"""
 
-'''
-This module will scrape slack for relevant open channels.
-'''
+import os
+import slack
+
+SLACK_TOKEN = os.environ['SLACK_TOKEN']
+
+client = slack.WebClient(SLACK_TOKEN)
+channels = client.channels_list()
