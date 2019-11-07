@@ -13,11 +13,10 @@ def _sections_parse(sections):
         created = issue.fields.created
         return (
             f'*{issue.key} — {assignee} — created {created[:10]}_{created[11:16]}*\n'
-            f'{issue.permalink()}\n'
             f'{issue.fields.summary[:70]}\n'
             '\n')
 
-    LINESEP = '—' * 35 + '\n'
+    LINESEP = '—' * 35 + '\n\n'
 
     text_items = []
 
@@ -30,7 +29,7 @@ def _sections_parse(sections):
                 issue_text = get_issue_fields(issue)
                 text_items.append(issue_text)
         else:
-            text_items.append(issue["no_issues_msg"])
+            text_items.append(sec["no_issues_msg"])
 
     return ''.join(text_items)
 

@@ -5,10 +5,10 @@ from settings import *
 
 
 def handover_job():
-    # Issues
     p1_issues = jira_interface.session.search_issues(P1_QUERY)
     cr_issues = jira_interface.session.search_issues(CR_QUERY)
     p2_issues = jira_interface.session.search_issues(P2_QUERY)
+    ot_issues = jira_interface.session.search_issues(OT_QUERY)
     ho_issues = jira_interface.session.search_issues(HO_QUERY)
 
     sections = [
@@ -38,7 +38,7 @@ def handover_job():
             "issues": ho_issues
         }]
 
-    handover_issue = slack_interface.send_handover_msg(sections)
+    handover_issue = jira_interface.create_handover_issue(sections)
 
     # DEBUG
     print(handover_issue.permalink())
