@@ -1,4 +1,7 @@
 import os
+from pytz import timezone
+
+TZ = timezone('America/Los_Angeles')
 
 # Where dat jira at!?
 ATLASSIAN_URL = 'https://birdco.atlassian.net/'
@@ -15,10 +18,7 @@ _SORT = 'ORDER BY key DESC'
 
 # JQL queries used to populate the different sections with relevant issues
 P1_QUERY = f'{_BASE} AND priority = 1 AND created > "-36h" {_SORT}'
+CR_QUERY = f'
 P2_QUERY = f'{_BASE} AND priority = 2 AND status != Closed {_SORT}'
-OTHER_QUERY = f'{_BASE} AND priority < 2 AND status != Closed {_SORT}'
-
-# These mesages will appear in lieu of relevant issues
-NO_P1_TEXT = '_No outages to show for the past 36 hrs._\n\n'
-NO_P2_TEXT = '_There are no outstanding P2 issues!_\n\n'
-NO_OTHER_TEXT = '_There are no outstanding P3-P5 issues!_\n\n'
+OT_QUERY = f'{_BASE} AND priority < 2 AND status != Closed {_SORT}'
+HO_QUERY = f'
