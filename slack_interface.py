@@ -12,24 +12,22 @@ def _section(text):
         }
     }
 
+
 def _parse_issues(issues):
-
-
+    pass
 
 
 def send_handover_msg(issue):
+    pass
+    # requests.post(WHOOK_URL, data=json.dumps(slack_msg))
 
 
-    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
+# def PLACEHOLDER():
 
+#     msg = (
+#         '@here\n'
+#         f'*{issue.fields.summary}*\n'
+#         f'{issue.permalink()}\n'
+#         f'{issue.fields.description}\n')
 
-
-def PLACEHOLDER():
-
-    msg = (
-        '@here\n'
-        f'*{issue.fields.summary}*\n'
-        f'{issue.permalink()}\n'
-        f'{issue.fields.description}\n')
-
-    slack_msg = {'text': msg}
+#     slack_msg = {'text': msg}

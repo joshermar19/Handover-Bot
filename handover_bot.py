@@ -1,27 +1,51 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from datetime import datetime
-
 import jira_interface
 import slack_interface
 from settings import *
 
 
-
-
-# These mesages will appear in lieu of relevant issues
-NO_P1_TEXT = '_No outages to show for the past 36 hrs._\n\n'
-NO_P2_TEXT = '_There are no outstanding P2 issues!_\n\n'
-NO_OTHER_TEXT = '_There are no outstanding P3-P5 issues!_\n\n'
-
-
-
 def handover_job():
-    date_local = datetime.now(TZ).date()
+    # Issues
+    p1_issues = jira_interface.session.search_issues(P1_QUERY)
+    cr_issues = jira_interface.session.search_issues(CR_QUERY)
+    p2_issues = jira_interface.session.search_issues(P2_QUERY)
+    ho_issues = jira_interface.session.search_issues(HO_QUERY)
 
-    description = description_text(date_local)
-    issue = jira_interface.create_issue(description, date_local)
+    sections = [
+        {
+            "heading": f'*Outages (P1s) in the last 36 hours:*\n',
+            "no_issues_msg": '_No outages to show for the past 36 hrs._\n\n',
+            "issues": p1_issues
+        },
+        {
+            "heading": f'*Deploys in the last 24 hours:*\n',
+            "no_issues_msg": '_No deploys to show for the past 24 hrs._\n\n',
+            "issues": cr_issues
+        },
+        {
+            "heading": f'*Outstanding P2 Issues ({len(p2_issues)})*:\n',
+            "no_issues_msg": '_There are no outstanding P2 issues!_\n\n',
+            "issues": p2_issues
+        },
+        {
+            "heading": f'*Outstanding P3-P5 Issues ({len(ot_issues)})*:\n',
+            "no_issues_msg": '_There are no outstanding P3-P5 issues!_\n\n',
+            "issues": ot_issues
+        },
+        {
+            "heading": f'*Open Handover Issues ({len(ho_issues)}):*\n',
+            "no_issues_msg": '_No open handover issues. Good job!_\n\n',
+            "issues": ho_issues
+        }]
 
-    slack_interface.send_handover_msg(issue)
+    handover_issue = slack_interface.send_handover_msg(sections)
+
+    # DEBUG
+    print(handover_issue.permalink())
+
+    # slack_interface.send_handover_msg(sections, handover_issue)
+
+    print('Handover ticket issued and message sent!')
 
 
 def main():

@@ -1,5 +1,5 @@
-import os
 from pytz import timezone
+import os
 
 TZ = timezone('America/Los_Angeles')
 
@@ -18,7 +18,7 @@ _SORT = 'ORDER BY key DESC'
 
 # JQL queries used to populate the different sections with relevant issues
 P1_QUERY = f'{_BASE} AND priority = 1 AND created > "-36h" {_SORT}'
-CR_QUERY = f'
+CR_QUERY = f'{_BASE} project = NOC AND type = "Change Request" AND summary ~ "Deploy" AND created > "-24h" {_SORT}'
 P2_QUERY = f'{_BASE} AND priority = 2 AND status != Closed {_SORT}'
 OT_QUERY = f'{_BASE} AND priority < 2 AND status != Closed {_SORT}'
-HO_QUERY = f'
+HO_QUERY = f'{_BASE} project = NOC AND type = Story AND summary ~ "NOC Handover" AND status != Done {_SORT}'
