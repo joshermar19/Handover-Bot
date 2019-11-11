@@ -14,12 +14,12 @@ def handover_job():
     sections = [
         {
             "heading": f'*Outages (P1s) in the last 36 hours:*\n',
-            "no_issues_msg": '_No outages to show for the past 36 hrs._\n\n',
+            "no_issues_msg": '_No outages to show for the last 36 hrs._\n\n',
             "issues": p1_issues
         },
         {
             "heading": f'*Deploys in the last 24 hours:*\n',
-            "no_issues_msg": '_No deploys to show for the past 24 hrs._\n\n',
+            "no_issues_msg": '_No deploys to show for the last 24 hrs._\n\n',
             "issues": cr_issues
         },
         {
@@ -39,13 +39,9 @@ def handover_job():
         }]
 
     handover_issue = jira_interface.create_handover_issue(sections)
+    slack_interface.send_handover_msg(sections, handover_issue)
 
-    # DEBUG
-    print(handover_issue.permalink())
-
-    # slack_interface.send_handover_msg(sections, handover_issue)
-
-    print('Handover ticket issued and message sent!')
+    print(f'\n{handover_issue} issued and message sent!')
 
 
 def main():
