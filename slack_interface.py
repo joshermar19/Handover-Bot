@@ -53,3 +53,15 @@ def send_handover_msg(sections, handover_issue):
     slack_msg = {"blocks": blocks}
 
     requests.post(WHOOK_URL, data=json.dumps(slack_msg))
+
+
+def send_reminder_msg():
+    reminder_text = (
+        '@here\n'
+        '\n'
+        '*Comence handover standup.*\n'
+        '_Please close the handover issue once the handover process is complete._\n')
+
+    slack_msg = {"blocks": [_txt_block(reminder_text)]}
+
+    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
