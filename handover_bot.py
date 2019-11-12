@@ -1,8 +1,8 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import jira_interface
 import slack_interface
+import slack_client
 from settings import *
-
 
 def handover_job():
     p1_issues = jira_interface.session.search_issues(P1_QUERY)

@@ -11,6 +11,7 @@ JIRA_PROJECT = 'NP'  # Use 'NP' for debug 'NOC' for production
 WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
 JIRA_USER = os.environ.get('JIRA_USER')
 JIRA_KEY = os.environ.get('JIRA_TOKEN')
+SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
 # For internal use as macros for queries
 _BASE = 'project = NOC'
