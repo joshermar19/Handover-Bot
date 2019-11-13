@@ -55,6 +55,8 @@ def main():
     sched.add_job(slack_interface.send_reminder_msg, 'cron', hour='15', minute='30', timezone=TZ)
     sched.start()
 
+    print('Handover job has been scheduled.\n')
+
 
 if __name__ == '__main__':
     main()
