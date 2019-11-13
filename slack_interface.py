@@ -125,7 +125,7 @@ def send_reminder_msg():
     reminder_text = (
         '@here\n'
         '\n'
-        '*Comence handover standup.*\n'
+        '*Commence handover standup.*\n'
         '_Please close the handover issue once the handover process is complete._\n')
 
     slack_msg = {"blocks": [_txt_block(reminder_text)]}
