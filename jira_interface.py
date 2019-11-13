@@ -36,7 +36,9 @@ def _issue_sections_parse(sections):
 
 
 def _channels_parse(channs):
-    text_items = [LINESEP, "*Open NOC Channels:*\n\n"]
+    text_items = [
+        LINESEP,
+        f"*Open NOC Channels ({len(channs)}):*\n\n"]
 
     for chan in channs:
 

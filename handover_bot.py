@@ -24,12 +24,12 @@ def handover_job():
             "issues": cr_issues
         },
         {
-            "heading": f'*Outstanding P2 Issues ({len(p2_issues)})*:',
+            "heading": f'*Outstanding P2 Issues ({len(p2_issues)}):*',
             "no_issues_msg": '_There are no outstanding P2 issues!_\n\n',
             "issues": p2_issues
         },
         {
-            "heading": f'*Outstanding P3-P5 Issues ({len(ot_issues)})*:',
+            "heading": f'*Outstanding P3-P5 Issues ({len(ot_issues)}):*',
             "no_issues_msg": '_There are no outstanding P3-P5 issues!_\n\n',
             "issues": ot_issues
         },

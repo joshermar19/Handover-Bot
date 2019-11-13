@@ -46,7 +46,7 @@ def _channels_section_builder(channs):
 
     blocks = [
         {"type": "divider"},
-        _txt_block("*Open NOC Channels:*")]
+        _txt_block(f"*Open NOC Channels ({len(channs)}):*")]
 
     text_items = []
 
