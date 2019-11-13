@@ -15,29 +15,47 @@ def _txt_block(text):
     }
 
 
-def _issue_section_builder(section):
+def _issues_section_builder(section):
     """Will return a list of properly formatted issue blocks or a list containing a single no issue msg block"""
 
-    def issue_block(issue):
-        """Get relevant fields from issue and return a nicely formatted block"""
-        assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
-        created = issue.fields.created
-        block = _txt_block(
-            f'<{issue.permalink()}|*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*>\n'
-            f'{issue.fields.summary[:70]}\n')
-        return block
+    # Starting from scratch
 
     blocks = [
         {"type": "divider"},  # This provides a nice line which delimits sections
         _txt_block(section['heading'])]
 
-    # Quite simply, if there are issues, show them. Othrwise, show the "no issues message"
-    if section['issues']:
-        issue_blocks = [issue_block(issue) for issue in section['issues']]
-        blocks.extend(issue_blocks)
-    else:
+    text_items = []
+
+    # If there are not issues, this function returns early
+    if not section['issues']:
         no_issues_msg = _txt_block(section['no_issues_msg'])
         blocks.append(no_issues_msg)
+        return blocks
+
+    for issue in section['issues']:
+        assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
+        created = issue.fields.created
+
+        text = (
+            f'<{issue.permalink()}|*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*>\n'
+            f'{issue.fields.summary[:70]}\n\n')
+
+        # As long as chars do not exceed 3k, keep appending
+        if len(''.join(text_items) + text) < 3000:
+            text_items.append(text)
+
+        # Once we know that any additional append would exceed 3k, finalize the current block
+        # and start a new one
+        else:
+            channs_block = _txt_block(''.join(text_items))
+            blocks.append(channs_block)
+
+            text_items = []
+            text_items.append(text)
+
+    # This must be done for the case when text length would not have exceeded 3k
+    channs_block = _txt_block(''.join(text_items))
+    blocks.append(channs_block)
 
     return blocks
 
@@ -72,7 +90,7 @@ def _channels_section_builder(channs):
             text_items = []
             text_items.append(text)
 
-    # This must be done for the final case when text length would not have exceeded 3k
+    # This must be done for the case when text length would not have exceeded 3k
     channs_block = _txt_block(''.join(text_items))
     blocks.append(channs_block)
 
@@ -84,16 +102,21 @@ def send_handover_msg(handover_issue, sections, channs):
         '@here\n\n'
         f'<{handover_issue.permalink()}|*{handover_issue.fields.summary}*>')
 
+    # First block is self explanatory
     blocks = [title]
 
+    # Extend the blocks with the issues sections
     for section in sections:
-        sec_blocks = _issue_section_builder(section)
-        blocks.extend(sec_blocks)
+        blocks.extend(_issues_section_builder(section))
 
+    # Finally, extend the blocks with the channels section
     channs_blocks = _channels_section_builder(channs)
     blocks.extend(channs_blocks)
 
     slack_msg = {"blocks": blocks}
+
+    # Debug
+    print(f'Total blocks = {len(blocks)}')
 
     requests.post(WHOOK_URL, data=json.dumps(slack_msg))
 
