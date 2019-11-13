@@ -4,6 +4,7 @@ import slack_interface
 import slack_client
 from settings import *
 
+
 def handover_job():
     p1_issues = jira_interface.session.search_issues(P1_QUERY)
     cr_issues = jira_interface.session.search_issues(CR_QUERY)
@@ -13,35 +14,39 @@ def handover_job():
 
     sections = [
         {
-            "heading": f'*Outages (P1s) in the last 36 hours:*\n',
+            "heading": f'*Outages (P1s) in the last 36 hours:*',
             "no_issues_msg": '_No outages to show for the last 36 hrs._\n\n',
             "issues": p1_issues
         },
         {
-            "heading": f'*Deploys in the last 24 hours:*\n',
+            "heading": f'*Deploys in the last 24 hours:*',
             "no_issues_msg": '_No deploys to show for the last 24 hrs._\n\n',
             "issues": cr_issues
         },
         {
-            "heading": f'*Outstanding P2 Issues ({len(p2_issues)})*:\n',
+            "heading": f'*Outstanding P2 Issues ({len(p2_issues)})*:',
             "no_issues_msg": '_There are no outstanding P2 issues!_\n\n',
             "issues": p2_issues
         },
         {
-            "heading": f'*Outstanding P3-P5 Issues ({len(ot_issues)})*:\n',
+            "heading": f'*Outstanding P3-P5 Issues ({len(ot_issues)})*:',
             "no_issues_msg": '_There are no outstanding P3-P5 issues!_\n\n',
             "issues": ot_issues
         },
         {
-            "heading": f'*Open Handover Issues ({len(ho_issues)}):*\n',
+            "heading": f'*Open Handover Issues ({len(ho_issues)}):*',
             "no_issues_msg": '_No open handover issues. Good job!_\n\n',
             "issues": ho_issues
         }]
 
-    handover_issue = jira_interface.create_handover_issue(sections)
-    slack_interface.send_handover_msg(sections, handover_issue)
+    open_channs = slack_client.get_open_channels()
 
-    print(f'\n{handover_issue} issued and message sent!')
+    handover_issue = jira_interface.create_handover_issue(sections, open_channs)
+    slack_interface.send_handover_msg(handover_issue, sections, open_channs)
+
+    # DEBUG
+    print(f"Created: {handover_issue.permalink()}")
+    print(f'Message sent!')
 
 
 def main():

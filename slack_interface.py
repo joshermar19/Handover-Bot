@@ -1,6 +1,8 @@
 import requests
 import json
-from settings import WHOOK_URL
+import slack_client
+from datetime import date
+from settings import WHOOK_URL, CHN_PFX
 
 
 def _txt_block(text):
@@ -13,7 +15,7 @@ def _txt_block(text):
     }
 
 
-def _section_builder(section):
+def _issue_section_builder(section):
     """Will return a list of properly formatted issue blocks or a list containing a single no issue msg block"""
 
     def issue_block(issue):
@@ -22,8 +24,7 @@ def _section_builder(section):
         created = issue.fields.created
         block = _txt_block(
             f'<{issue.permalink()}|*{issue.key} — {assignee} — created {created[:10]}_{created[11:16]}*>\n'
-            f'{issue.fields.summary[:70]}\n'
-            '\n')
+            f'{issue.fields.summary[:70]}\n')
         return block
 
     blocks = [
@@ -41,14 +42,56 @@ def _section_builder(section):
     return blocks
 
 
-def send_handover_msg(sections, handover_issue):
-    title = _txt_block(f'<{handover_issue.permalink()}|*{handover_issue.fields.summary}*>')
+def _channels_section_builder(channs):
 
-    blocks = [_txt_block('@here'), title]
+    blocks = [
+        {"type": "divider"},
+        _txt_block("*Open NOC Channels:*")]
+
+    text_items = []
+
+    for chan in channs:
+
+        creator = slack_client.client.users_info(user=chan['creator'])
+        cr_name = creator['user']['name']
+
+        created = date.fromtimestamp(chan['created'])
+
+        text = f"<{CHN_PFX}{chan['id']}|*#{chan['name']} — {cr_name} — {created}*>\n\n"
+
+        # As long as chars do not exceed 3k, keep appending
+        if len(''.join(text_items) + text) < 3000:
+            text_items.append(text)
+
+        # Once we know that any additional append would exceed 3k, finalize the current block
+        # and start a new one
+        else:
+            channs_block = _txt_block(''.join(text_items))
+            blocks.append(channs_block)
+
+            text_items = []
+            text_items.append(text)
+
+    # This must be done for the final case when text length would not have exceeded 3k
+    channs_block = _txt_block(''.join(text_items))
+    blocks.append(channs_block)
+
+    return blocks
+
+
+def send_handover_msg(handover_issue, sections, channs):
+    title = _txt_block(
+        '@here\n\n'
+        f'<{handover_issue.permalink()}|*{handover_issue.fields.summary}*>')
+
+    blocks = [title]
 
     for section in sections:
-        sec_blocks = _section_builder(section)
+        sec_blocks = _issue_section_builder(section)
         blocks.extend(sec_blocks)
+
+    channs_blocks = _channels_section_builder(channs)
+    blocks.extend(channs_blocks)
 
     slack_msg = {"blocks": blocks}
 

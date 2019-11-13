@@ -13,6 +13,9 @@ JIRA_USER = os.environ.get('JIRA_USER')
 JIRA_KEY = os.environ.get('JIRA_TOKEN')
 SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
+# Slack channel prefix
+CHN_PFX = 'https://birdrides.slack.com/archives/'
+
 # For internal use as macros for queries
 _BASE = 'project = NOC'
 _SORT = 'ORDER BY key DESC'
