@@ -51,8 +51,8 @@ def handover_job():
 
 def main():
     sched = BlockingScheduler()
-    sched.add_job(handover_job, 'cron', hour='14', minute='30', timezone=TZ)
-    sched.add_job(slack_interface.send_reminder_msg, 'cron', hour='15', timezone=TZ)
+    sched.add_job(handover_job, 'cron', hour='15', timezone=TZ)
+    sched.add_job(slack_interface.send_reminder_msg, 'cron', hour='15', minute='30', timezone=TZ)
     sched.start()
 
 
