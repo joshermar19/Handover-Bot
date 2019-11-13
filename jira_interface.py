@@ -14,7 +14,7 @@ def _issue_sections_parse(sections):
         assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
         created = issue.fields.created
         return (
-            f'*{issue.key} — {assignee} — created {created[:10]}_{created[11:16]}*\n'
+            f'*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*\n'
             f'{issue.fields.summary[:70]}\n'
             '\n')
 

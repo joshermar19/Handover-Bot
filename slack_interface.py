@@ -23,7 +23,7 @@ def _issue_section_builder(section):
         assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
         created = issue.fields.created
         block = _txt_block(
-            f'<{issue.permalink()}|*{issue.key} — {assignee} — created {created[:10]}_{created[11:16]}*>\n'
+            f'<{issue.permalink()}|*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*>\n'
             f'{issue.fields.summary[:70]}\n')
         return block
 
