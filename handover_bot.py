@@ -5,7 +5,7 @@ import slack_client
 from settings import *
 
 
-def handover_job():
+def handover_job(pfx):
     p1_issues = jira_interface.session.search_issues(P1_QUERY)
     cr_issues = jira_interface.session.search_issues(CR_QUERY)
     p2_issues = jira_interface.session.search_issues(P2_QUERY)
@@ -41,7 +41,7 @@ def handover_job():
 
     open_channs = slack_client.get_open_channels()
 
-    handover_issue = jira_interface.create_handover_issue(sections, open_channs)
+    handover_issue = jira_interface.create_handover_issue(pfx, sections, open_channs)
     slack_interface.send_handover_msg(handover_issue, sections, open_channs)
 
     # DEBUG
@@ -51,7 +51,9 @@ def handover_job():
 
 def main():
     sched = BlockingScheduler()
-    sched.add_job(handover_job, 'cron', hour='14', minute='30', timezone=TZ)
+    sched.add_job(lambda: handover_job(TIME_PREFIXES[0]), 'cron', hour='05', minute='30', timezone=TZ)
+    sched.add_job(lambda: handover_job(TIME_PREFIXES[1]), 'cron', hour='14', minute='30', timezone=TZ)
+    sched.add_job(lambda: handover_job(TIME_PREFIXES[2]), 'cron', hour='21', minute='30', timezone=TZ)
     sched.add_job(slack_interface.send_reminder_msg, 'cron', hour='15', timezone=TZ)
 
     print('Starting jobs scheduler...\n')

@@ -53,13 +53,13 @@ def _channels_parse(channs):
     return text_items
 
 
-def create_handover_issue(sections, channels):
+def create_handover_issue(pfx, sections, channels):
     date_local = datetime.now(TZ).date()
     desc_items = _issue_sections_parse(sections) + _channels_parse(channels)
 
     issue_fields = {
         'project': JIRA_PROJECT,
-        'summary': f'NOC Handover {date_local}',
+        'summary': f'{pfx} NOC Handover {date_local}',
         'description': ''.join(desc_items),
         'issuetype': {'name': 'Story'},
     }
