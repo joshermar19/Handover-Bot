@@ -7,7 +7,7 @@ TIME_PREFIXES = ['AM', 'PM', 'ON']
 
 # Where dat jira at!?
 ATLASSIAN_URL = 'https://birdco.atlassian.net/'
-JIRA_PROJECT = 'NP'  # Use 'NP' for debug 'NOC' for production
+JIRA_PROJECT = 'NOC'  # Use 'NP' for debug 'NOC' for production
 
 # Secrets
 WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
