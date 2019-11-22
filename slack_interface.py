@@ -75,7 +75,7 @@ def _channels_section_builder(channs):
 
         created = date.fromtimestamp(chan['created'])
 
-        text = f"<{CHN_PFX}{chan['id']}|*#{chan['name']} — {cr_name} — {created}*>\n\n"
+        text = f"<{CHN_PFX}{chan['id']}|*#{chan['name']} — {cr_name} — {created}*>\n"
 
         # As long as chars do not exceed 3k, keep appending
         if len(''.join(text_items) + text) < 3000:

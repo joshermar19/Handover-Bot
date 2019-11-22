@@ -46,9 +46,7 @@ def _channels_parse(channs):
         cr_name = creator['user']['name']
         created = date.fromtimestamp(chan['created'])
 
-        text_items.append(
-            f"*#{chan['name']} — {cr_name} — {created}*\n"
-            f"{CHN_PFX}{chan['id']}\n\n")
+        text_items.append(f"*#{chan['name']} — {cr_name} — {created}*\n")
 
     return text_items
 
