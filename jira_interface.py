@@ -8,16 +8,16 @@ session = JIRA(ATLASSIAN_URL, basic_auth=(JIRA_USER, JIRA_KEY))
 LINESEP = '—' * 35 + '\n\n'
 
 
+def _get_issue_fields(issue):
+    assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
+    created = issue.fields.created
+    return (
+        f'*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*\n'
+        f'{issue.fields.summary[:70]}\n'
+        '\n')
+
+
 def _issue_sections_parse(sections):
-
-    def get_issue_fields(issue):
-        assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
-        created = issue.fields.created
-        return (
-            f'*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*\n'
-            f'{issue.fields.summary[:70]}\n'
-            '\n')
-
     text_items = []
 
     for sec in sections:
@@ -26,8 +26,7 @@ def _issue_sections_parse(sections):
 
         if sec["issues"]:
             for issue in sec["issues"]:
-
-                issue_text = get_issue_fields(issue)
+                issue_text = _get_issue_fields(issue)
                 text_items.append(issue_text)
         else:
             text_items.append(sec["no_issues_msg"])
@@ -52,8 +51,13 @@ def _channels_parse(channs):
 
 
 def create_handover_issue(pfx, sections, channels):
+    PREFACE = (
+        "_Please check last OPEN handover issue for important comments, "
+        "and be sure to scold anyone who forgets to close their HO issue"
+        " without reason (there should never be more than one)._")
+
     date_local = datetime.now(TZ).date()
-    desc_items = _issue_sections_parse(sections) + _channels_parse(channels)
+    desc_items = [PREFACE] + _issue_sections_parse(sections) + _channels_parse(channels)
 
     issue_fields = {
         'project': JIRA_PROJECT,
