@@ -54,7 +54,7 @@ def create_handover_issue(pfx, sections, channels):
     PREFACE = (
         "_Please check last OPEN handover issue for important comments, "
         "and be sure to scold anyone who forgets to close their HO issue"
-        " without reason (there should never be more than one)._")
+        " without reason (there should never be more than one)._\n")
 
     date_local = datetime.now(TZ).date()
     desc_items = [PREFACE] + _issue_sections_parse(sections) + _channels_parse(channels)
