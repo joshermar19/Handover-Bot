@@ -3,8 +3,6 @@ import os
 
 TZ = timezone('America/Los_Angeles')
 
-TIME_PREFIXES = ['AM', 'PM', 'ON']
-
 # Where dat jira at!?
 ATLASSIAN_URL = 'https://birdco.atlassian.net/'
 JIRA_PROJECT = 'NOC'  # Use 'NP' for debug 'NOC' for production
