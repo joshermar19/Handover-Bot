@@ -54,11 +54,11 @@ def handover_job(pfx):
 def main():
     sched = BlockingScheduler()
 
-    # AM Handover fires at 21:30. This is for On call as well as Morning Shift
-    sched.add_job(lambda: handover_job('ON/AM'), 'cron', hour='21', minute='30', timezone=TZ)
-
     # PM Handover fires at 14:30
     sched.add_job(lambda: handover_job('PM'), 'cron', hour='14', minute='30', timezone=TZ)
+
+    # AM Handover fires at 21:30. This is for On call as well as Morning Shift
+    sched.add_job(lambda: handover_job('ON/AM'), 'cron', hour='21', minute='30', timezone=TZ)
 
     sched.add_job(slack_interface.send_reminder_msg, 'cron', hour='15', timezone=TZ)
 
