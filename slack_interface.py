@@ -121,7 +121,19 @@ def send_handover_msg(handover_issue, sections, channs):
     requests.post(WHOOK_URL, data=json.dumps(slack_msg))
 
 
-def send_reminder_msg():
+def send_morning_reminder():
+    reminder_text = (
+        '@here\n'
+        '\n'
+        '*Good morning team!*\n'
+        '_Please review ON/AM handover ticket, and be sure to assign and close it._\n')
+
+    slack_msg = {"blocks": [_txt_block(reminder_text)]}
+
+    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
+
+
+def send_standup_reminder():
     reminder_text = (
         '@here\n'
         '\n'
