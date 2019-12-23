@@ -1,8 +1,41 @@
+from settings import SLACK_TOKEN, SLACK_WHOOK
+import slack
 import requests
 import json
-import slack_client
-from datetime import date
-from settings import WHOOK_URL, CHN_PFX
+
+client = slack.WebClient(token=SLACK_TOKEN)
+
+
+def _append_relevant(resp, rel_channs):
+    # For each "resp", chech for relevant channels and append them to my list
+    for c in resp['channels']:
+        if c['is_archived']:
+            continue
+        if c['name'][:9] != 'issue-noc':
+            continue
+        rel_channs.append(c)
+
+
+def get_open_channels():
+    relevant_channels = []
+
+    cursor = ''
+    while True:  # This has to run at least once with a empty cursor
+        response = client.channels_list(cursor=cursor)
+        _append_relevant(response, relevant_channels)
+
+        cursor = response['response_metadata']['next_cursor']
+        if not cursor:
+            break
+
+    relevant_channels.sort(key=lambda chan: chan['created'], reverse=True)
+
+    return relevant_channels
+
+
+def get_user_name(usr):
+    response = client.users_info(user=usr)
+    return response['user']['name']
 
 
 def _txt_block(text):
@@ -15,131 +48,50 @@ def _txt_block(text):
     }
 
 
-def _issues_section_builder(section):
-    """Will return a list of properly formatted issue blocks or a list containing a single no issue msg block"""
+def _block_builder(section):
+    blocks = []
+    block_lines = []
 
-    # Starting from scratch
-
-    blocks = [
-        {"type": "divider"},  # This provides a nice line which delimits sections
-        _txt_block(section['heading'])]
-
-    text_items = []
-
-    # If there are not issues, this function returns early
-    if not section['issues']:
-        no_issues_msg = _txt_block(section['no_issues_msg'])
-        blocks.append(no_issues_msg)
-        return blocks
-
-    for issue in section['issues']:
-        assignee = getattr(issue.fields.assignee, 'name', 'unassigned')
-        created = issue.fields.created
-
-        text = (
-            f'<{issue.permalink()}|*{issue.key} — {assignee} — {created[:10]}_{created[11:16]}*>\n'
-            f'{issue.fields.summary[:70]}\n\n')
-
-        # As long as chars do not exceed 3k, keep appending
-        if len(''.join(text_items) + text) < 3000:
-            text_items.append(text)
-
-        # Once we know that any additional append would exceed 3k, finalize the current block
-        # and start a new one
+    for line in section.splitlines():
+        # If the total char length will not exceed 3k, keep appending lines
+        if len('\n'.join(block_lines)) + len(line) < 3000:
+            block_lines.append(line)
+        # Else reset block_lines list and append to blocks immediately
         else:
-            channs_block = _txt_block(''.join(text_items))
-            blocks.append(channs_block)
+            blocks.append(_txt_block('\n'.join(block_lines)))
+            block_lines = [line]
 
-            text_items = []
-            text_items.append(text)
-
-    # This must be done for the case when text length would not have exceeded 3k
-    channs_block = _txt_block(''.join(text_items))
-    blocks.append(channs_block)
+    # Append any left over lines
+    if block_lines:
+        blocks.append(_txt_block('\n'.join(block_lines)))
 
     return blocks
 
 
-def _channels_section_builder(channs):
+def send_msg(*segments):
+    """Accepts any number of message segments"""
+    blocks = []
 
-    blocks = [
-        {"type": "divider"},
-        _txt_block(f"*Open NOC Channels ({len(channs)}):*")]
+    for segment in segments:
+        blocks.extend(_block_builder(segment))
 
-    text_items = []
+        if segment != segments[-1]:  # Don't add line for last (or only) segment
+            blocks.append({"type": "divider"})
 
-    for chan in channs:
+    msg = {"blocks": blocks}
 
-        creator = slack_client.client.users_info(user=chan['creator'])
-        cr_name = creator['user']['name']
-
-        created = date.fromtimestamp(chan['created'])
-
-        text = f"<{CHN_PFX}{chan['id']}|*#{chan['name']} — {cr_name} — {created}*>\n"
-
-        # As long as chars do not exceed 3k, keep appending
-        if len(''.join(text_items) + text) < 3000:
-            text_items.append(text)
-
-        # Once we know that any additional append would exceed 3k, finalize the current block
-        # and start a new one
-        else:
-            channs_block = _txt_block(''.join(text_items))
-            blocks.append(channs_block)
-
-            text_items = []
-            text_items.append(text)
-
-    # This must be done for the case when text length would not have exceeded 3k
-    channs_block = _txt_block(''.join(text_items))
-    blocks.append(channs_block)
-
-    return blocks
+    requests.post(SLACK_WHOOK, data=json.dumps(msg))
 
 
-def send_handover_msg(handover_issue, sections, channs):
-    title = _txt_block(
-        '@here\n\n'
-        f'<{handover_issue.permalink()}|*{handover_issue.fields.summary}*>')
+def send_handover_msg(ho_ticket, sections, preface=''):
 
-    # First block is self explanatory
-    blocks = [title]
+    sections_text = [
+        (
+            f'@here\n'
+            f'{preface}'
+            f'<{ho_ticket.permalink()}|*{ho_ticket.fields.summary}*>'
+        )]
 
-    # Extend the blocks with the issues sections
-    for section in sections:
-        blocks.extend(_issues_section_builder(section))
+    sections_text.extend([s.get_section(for_slack=True) for s in sections])
 
-    # Finally, extend the blocks with the channels section
-    channs_blocks = _channels_section_builder(channs)
-    blocks.extend(channs_blocks)
-
-    slack_msg = {"blocks": blocks}
-
-    # Debug
-    print(f'Total blocks = {len(blocks)}')
-
-    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
-
-
-def send_morning_reminder():
-    reminder_text = (
-        '@here\n'
-        '\n'
-        '*Good morning team!*\n'
-        '_Please review ON/AM handover ticket, and be sure to assign and close it._\n')
-
-    slack_msg = {"blocks": [_txt_block(reminder_text)]}
-
-    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
-
-
-def send_standup_reminder():
-    reminder_text = (
-        '@here\n'
-        '\n'
-        '*Commence handover standup.*\n'
-        '_Please close the handover issue once the handover process is complete._\n')
-
-    slack_msg = {"blocks": [_txt_block(reminder_text)]}
-
-    requests.post(WHOOK_URL, data=json.dumps(slack_msg))
+    send_msg(*sections_text)

@@ -3,18 +3,20 @@ import os
 
 TZ = timezone('America/Los_Angeles')
 
-# Where dat jira at!?
-ATLASSIAN_URL = 'https://birdco.atlassian.net/'
-JIRA_PROJECT = 'NOC'  # Use 'NP' for debug 'NOC' for production
-
-# Secrets
-WHOOK_URL = os.environ.get('HANDOVER_WHOOK')
+# Jira Secrets
 JIRA_USER = os.environ.get('JIRA_USER')
 JIRA_KEY = os.environ.get('JIRA_TOKEN')
+
+# Jira settings
+JIRA_URL = 'https://birdco.atlassian.net/'
+JIRA_PROJECT = 'NOC'  # Use 'NP' for debug 'NOC' for production
+
+# Slack Secrets
+SLACK_WHOOK = os.environ.get('HANDOVER_WHOOK')
 SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
 # Slack channel prefix
-CHN_PFX = 'https://birdrides.slack.com/archives/'
+CHN_URL_BASE = 'https://birdrides.slack.com/archives/'
 
 # For internal use as macros for queries
 _BASE = 'project = NOC'
