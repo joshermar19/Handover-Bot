@@ -12,9 +12,12 @@ def mid_handover():
     mid_ticket = create_ticket(pfx, sections)
     send_handover_msg(mid_ticket, sections)
 
+    print('Job completed')
+
 
 # Should fire shortly after mid_handover
 def standup_reminder():
+    print('Sending "standup" reminder')
     msg = (
         '@here\n'
         '\n'
@@ -22,6 +25,8 @@ def standup_reminder():
         '_Remember to assign and close the handover ticket._\n')
 
     send_msg(msg)
+
+    print('Reminder sent')
 
 
 # Should fire late in the evening
@@ -35,6 +40,8 @@ def on_am_handover():
     on_am_ticket = create_ticket(pfx, sections)
     send_handover_msg(on_am_ticket, sections)
 
+    print('Job completed')
+
 
 # Should fire early in the morning
 def on_am_update():
@@ -42,8 +49,10 @@ def on_am_update():
         '*Good morning team!*\n'
         '_ON/AM handover ticket has been updated to include any overnight issues._\n\n')
 
-    print('Updating ON/AM ticket')
+    print('Commencing update of ON/AM ticket')
     sections = full_sections()
     update_ticket(on_am_ticket, sections)
 
     send_handover_msg(on_am_ticket, sections, preface=PREFACE)
+
+    print('Job completed')
