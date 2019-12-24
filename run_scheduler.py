@@ -18,7 +18,7 @@ def scheduler():
 
     sched.add_job(
         on_am_handover,
-        'cron', hour='21', minute='30', timezone=TZ)
+        'cron', hour='23', minute='30', timezone=TZ)
 
     sched.add_job(
         on_am_update,
