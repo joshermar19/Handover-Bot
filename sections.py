@@ -6,7 +6,7 @@ from slack_interface import get_open_channels, get_user_name
 
 class LineItem():
     def __init__(self, title, user, created, summary, link):
-        self.summary = summary[:50]  # Maybe this should be a constant/setting at some point
+        self.summary = summary[:MAX_SUM_LEN]  # Maybe this should be a constant/setting at some point
         self.link = link
         self.base_title = f'*{title} — {user} — {created[:10]}*'
 

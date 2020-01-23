@@ -30,3 +30,5 @@ DP_QUERY = f'{_BASE} AND type = "Change Record" AND summary ~ "Deploy" AND creat
 CR_QUERY = f'{_BASE} AND type = "Change Record" AND status != Closed {_SORT}'
 P2_QUERY = f'{_BASE} AND {_ISS_TYPES} AND priority = 2 AND status != Closed {_SORT}'
 OT_QUERY = f'{_BASE} AND {_ISS_TYPES} AND priority < 2 AND status != Closed {_SORT}'
+
+MAX_SUM_LEN = 70
