@@ -2,7 +2,7 @@
 This module hanbdles ingress of data from slack and jira
 '''
 from slack_interface import get_open_channels, get_user_name
-from settings import CHN_URL_BASE, MAX_SUM_LEN
+from settings import *  # Not best practice, but that's a shit ton of queries
 from jira_interface import get_tickets
 from datetime import date
 
@@ -28,7 +28,7 @@ class Section():
         self.show_count = show_count
         self.no_summaries = no_summaries
 
-        print(f'Instantiated section for "{self.heading}"')
+        print(f'Populated section for "{self.heading}"')
 
     def get_section(self, for_slack=False):
         title_count = f' ({len(self.line_items)})' if self.show_count else ''
@@ -93,3 +93,44 @@ class SlackSection(Section):
             message_if_none=message_if_none,
             show_count=show_count,
             no_summaries=no_summaries)
+
+
+# The following function defines the totality of sections and the order in which they will appear
+def get_sections():
+    return [
+        JiraSection(
+            heading='Open Handover Issues',
+            query=HO_QUERY,
+            message_if_none='No open handover issues.',
+            show_count=False
+        ),
+        JiraSection(
+            heading='Recent Change Records (-24hrs, any status)',
+            query=CR_QUERY,
+            message_if_none='No recent CR issues.',
+            show_count=False
+        ),
+        JiraSection(
+            heading='Recent Outages (-36hrs, any status)',
+            query=P1_QUERY,
+            message_if_none='No recent outages (knock on wood).',
+            show_count=False
+        ),
+        JiraSection(
+            heading='Outstanding P2 Incidents',
+            query=P2_QUERY,
+            message_if_none='No outstanding P2 incidents.',
+        ),
+        JiraSection(
+            heading='Outstanding P3 Incidents',
+            query=P3_QUERY,
+            message_if_none='No outstanding P3 incidents.',
+        ),
+        JiraSection(
+            heading='Outstanding P4-P5 Incidents',
+            query=P4_P5_QUERY,
+            message_if_none='No outstanding P4-P5 incidents.',
+        ),
+        SlackSection(
+            heading='Open NOC Channels',
+        )]

@@ -1,4 +1,4 @@
-from settings import TZ, JIRA_URL, JIRA_USER, JIRA_KEY, JIRA_PROJECT, JIRA_SEP
+from settings import TZ, JIRA_USER, JIRA_KEY, JIRA_URL, JIRA_PROJECT, JIRA_SEP
 from datetime import datetime
 from jira.client import JIRA
 
@@ -12,7 +12,7 @@ def get_tickets(query):
 def create_ticket(pfx, sections):
     date_local = datetime.now(TZ).date()
 
-    descr = ''.join([SEPARATOR + s.get_section() for s in sections])
+    descr = ''.join([JIRA_SEP + s.get_section() for s in sections])
 
     issue_fields = {
         'project': JIRA_PROJECT,
@@ -26,5 +26,5 @@ def create_ticket(pfx, sections):
 
 
 def update_ticket(ticket, sections):
-    descr = ''.join([SEPARATOR + s.get_section() for s in sections])
+    descr = ''.join([JIRA_SEP + s.get_section() for s in sections])
     ticket.update(description=descr)
