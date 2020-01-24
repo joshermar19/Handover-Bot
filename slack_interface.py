@@ -1,6 +1,6 @@
 from settings import SLACK_TOKEN, SLACK_WHOOK
-import slack
 import requests
+import slack
 import json
 
 client = slack.WebClient(token=SLACK_TOKEN)

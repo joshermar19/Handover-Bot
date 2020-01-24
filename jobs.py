@@ -1,6 +1,6 @@
-from sections import full_sections
 from jira_interface import create_ticket, update_ticket
 from slack_interface import send_msg, send_handover_msg
+from settings import SECTIONS
 
 
 # Fires in the middle of the work day
@@ -8,9 +8,8 @@ def mid_handover():
     pfx = "Mid-Shift"
     print(f'Commencing "{pfx}" handover job...')
 
-    sections = full_sections()
-    mid_ticket = create_ticket(pfx, sections)
-    send_handover_msg(mid_ticket, sections)
+    mid_ticket = create_ticket(pfx, SECTIONS)
+    send_handover_msg(mid_ticket, SECTIONS)
 
     print('Job completed')
 
@@ -33,12 +32,11 @@ def standup_reminder():
 def on_am_handover():
     pfx = "Overnight/Morning"
     print(f'Commencing "{pfx}" handover job...')
-    sections = full_sections()
 
     global on_am_ticket  # This needs to be updated by am handover
 
-    on_am_ticket = create_ticket(pfx, sections)
-    send_handover_msg(on_am_ticket, sections)
+    on_am_ticket = create_ticket(pfx, SECTIONS)
+    send_handover_msg(on_am_ticket, SECTIONS)
 
     print('Job completed')
 
@@ -50,9 +48,9 @@ def on_am_update():
         '_ON/AM handover ticket has been updated to include any overnight issues._\n\n')
 
     print('Commencing update of ON/AM ticket')
-    sections = full_sections()
-    update_ticket(on_am_ticket, sections)
 
-    send_handover_msg(on_am_ticket, sections, preface=PREFACE)
+    update_ticket(on_am_ticket, SECTIONS)
+
+    send_handover_msg(on_am_ticket, SECTIONS, preface=PREFACE)
 
     print('Job completed')

@@ -1,9 +1,6 @@
-from settings import *
+from settings import TZ, JIRA_URL, JIRA_USER, JIRA_KEY, JIRA_PROJECT, JIRA_SEP
 from datetime import datetime
 from jira.client import JIRA
-
-SEPARATOR = '—' * 35 + '\n\n'
-
 
 session = JIRA(JIRA_URL, basic_auth=(JIRA_USER, JIRA_KEY))
 

@@ -1,12 +1,15 @@
-from settings import *
-from datetime import date
-from jira_interface import get_tickets
+'''
+This module hanbdles ingress of data from slack and jira
+'''
 from slack_interface import get_open_channels, get_user_name
+from settings import CHN_URL_BASE, MAX_SUM_LEN
+from jira_interface import get_tickets
+from datetime import date
 
 
 class LineItem():
     def __init__(self, title, user, created, summary, link):
-        self.summary = summary[:MAX_SUM_LEN]  # Maybe this should be a constant/setting at some point
+        self.summary = summary[:MAX_SUM_LEN]
         self.link = link
         self.base_title = f'*{title} — {user} — {created[:10]}*'
 
@@ -14,7 +17,7 @@ class LineItem():
         return self.base_title
 
     def slack_line_title(self):
-        return f'<{self.link}|{self.base_title}>'  # Basically return the same but with a hyperlink
+        return f'<{self.link}|{self.base_title}>'  # This one includes a Slack formatted hyperlink
 
 
 class Section():
@@ -32,7 +35,7 @@ class Section():
         section_items = [f'*{self.heading}{title_count}:*\n\n']
 
         if not self.line_items:
-            section_items.append(f'_{self.message_if_none}_\n')  # This formatting should be common across sections
+            section_items.append(f'_{self.message_if_none}_\n')
         else:
             for li in self.line_items:
                 title = li.slack_line_title() if for_slack else li.jira_line_title()
@@ -90,47 +93,3 @@ class SlackSection(Section):
             message_if_none=message_if_none,
             show_count=show_count,
             no_summaries=no_summaries)
-
-
-def full_sections():
-    sections = [
-        JiraSection(
-            heading='Open Handover Issues',
-            query=HO_QUERY,
-            message_if_none='No open handover issues.',
-            show_count=False
-        ),
-        JiraSection(
-            heading='Outages in the last 36 hours',
-            query=P1_QUERY,
-            message_if_none='No outages in last 36 hrs (knock on wood).',
-            show_count=False
-        ),
-        JiraSection(
-            heading='Deploys in the last 24 hours',
-            query=DP_QUERY,
-            message_if_none='No recent deploys.',
-            show_count=False
-        ),
-        JiraSection(
-            heading='Outstanding Change Records',
-            query=CR_QUERY,
-            message_if_none='There are no outstanding CR issues.',
-            show_count=False
-        ),
-        JiraSection(
-            heading='Outstanding P2 Incidents',
-            query=P2_QUERY,
-            message_if_none='There are no outstanding P2 incidents.',
-        ),
-        JiraSection(
-            heading='Outstanding P3-P5 Incidents',
-            query=OT_QUERY,
-            message_if_none='There are no outstanding P3-P5 incidents.',
-        ),
-        SlackSection(
-            heading='Open NOC Channels',
-        )
-    ]
-
-    return sections
