@@ -3,7 +3,7 @@ from jira_interface import create_ticket, update_ticket
 from slack_interface import send_msg, send_handover_msg
 
 
-# Should fire in the middle of the work day
+# Fires in the middle of the work day
 def mid_handover():
     pfx = "Mid-Shift"
     print(f'Commencing "{pfx}" handover job...')
@@ -15,7 +15,7 @@ def mid_handover():
     print('Job completed')
 
 
-# Should fire shortly after mid_handover
+# Fires shortly after mid_handover
 def standup_reminder():
     print('Sending "standup" reminder')
     msg = (
@@ -29,7 +29,7 @@ def standup_reminder():
     print('Reminder sent')
 
 
-# Should fire late in the evening
+# Fires late in the evening
 def on_am_handover():
     pfx = "Overnight/Morning"
     print(f'Commencing "{pfx}" handover job...')
@@ -43,7 +43,7 @@ def on_am_handover():
     print('Job completed')
 
 
-# Should fire early in the morning
+# Fires early in the morning
 def on_am_update():
     PREFACE = (
         '*Good morning team!*\n'
