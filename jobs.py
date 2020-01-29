@@ -63,3 +63,12 @@ def on_am_update():
     send_handover_msg(on_am_ticket, sections, preface=PREFACE)
 
     print('Job completed')
+
+
+# I expect to use this soon
+def ad_hoc_handover(pfx):
+    print(f'Commencing "{pfx}" handover job...')
+    sections = get_sections()
+    ticket = create_ticket(pfx, sections)
+    send_handover_msg(ticket, sections)
+    print('Job completed')
