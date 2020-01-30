@@ -1,6 +1,4 @@
 from settings import TZ, JiraSettings
-
-# TZ, JIRA_USER, JIRA_KEY, JIRA_URL, JIRA_PROJECT, JIRA_SEP
 from datetime import datetime
 from jira.client import JIRA
 
