@@ -1,15 +1,12 @@
-'''
-This module hanbdles ingress of data from slack and jira
-'''
 from slack_interface import get_open_channels, get_user_name
-from settings import *  # Not best practice, but that's a shit ton of queries
+from settings import Queries, SectionSettings
 from jira_interface import get_tickets
 from datetime import date
 
 
 class LineItem():
     def __init__(self, title, user, created, summary, link):
-        self.summary = summary[:MAX_SUM_LEN]
+        self.summary = summary[:SectionSettings.MAX_SUM_LEN]
         self.link = link
         self.base_title = f'*{title} — {user} — {created[:10]}*'
 
@@ -84,7 +81,7 @@ class SlackSection(Section):
                     user=get_user_name(channel['creator']),
                     created=str(date.fromtimestamp(channel['created'])),
                     summary=channel['topic']['value'],
-                    link=f"{CHN_URL_BASE}{channel['id']}"))
+                    link=f"{SectionSettings.CHN_URL_BASE}{channel['id']}"))
 
         Section.__init__(
             self,
@@ -100,35 +97,35 @@ def get_sections():
     return [
         JiraSection(
             heading='Open Handover Issues',
-            query=HO_QUERY,
+            query=Queries.HO,
             message_if_none='No open handover issues.',
             show_count=False
         ),
         JiraSection(
             heading='Recent Change Records (-24hrs, any status)',
-            query=CR_QUERY,
+            query=Queries.CR,
             message_if_none='No recent CR issues.',
             show_count=False
         ),
         JiraSection(
             heading='Recent Outages (-36hrs, any status)',
-            query=P1_QUERY,
+            query=Queries.P1,
             message_if_none='No recent outages (knock on wood).',
             show_count=False
         ),
         JiraSection(
             heading='Outstanding P2 Incidents',
-            query=P2_QUERY,
+            query=Queries.P2,
             message_if_none='No outstanding P2 incidents.',
         ),
         JiraSection(
             heading='Outstanding P3 Incidents',
-            query=P3_QUERY,
+            query=Queries.P3,
             message_if_none='No outstanding P3 incidents.',
         ),
         JiraSection(
             heading='Outstanding P4-P5 Incidents',
-            query=P4_P5_QUERY,
+            query=Queries.P4P5,
             message_if_none='No outstanding P4-P5 incidents.',
         ),
         SlackSection(

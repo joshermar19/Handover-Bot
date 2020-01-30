@@ -1,8 +1,13 @@
-from settings import TZ, JIRA_USER, JIRA_KEY, JIRA_URL, JIRA_PROJECT, JIRA_SEP
+from settings import TZ, JiraSettings
+
+# TZ, JIRA_USER, JIRA_KEY, JIRA_URL, JIRA_PROJECT, JIRA_SEP
 from datetime import datetime
 from jira.client import JIRA
 
-session = JIRA(JIRA_URL, basic_auth=(JIRA_USER, JIRA_KEY))
+
+_SEP = '—' * 35 + '\n\n'
+
+session = JIRA(JiraSettings.URL, basic_auth=(JiraSettings.USER, JiraSettings.TOKEN))
 
 
 def get_tickets(query):
@@ -12,10 +17,10 @@ def get_tickets(query):
 def create_ticket(pfx, sections):
     date_local = datetime.now(TZ).date()
 
-    descr = ''.join([JIRA_SEP + s.get_section() for s in sections])
+    descr = ''.join([_SEP + s.get_section() for s in sections])
 
     issue_fields = {
-        'project': JIRA_PROJECT,
+        'project': JiraSettings.PROJECT,
         'summary': f'{pfx} NOC Handover {date_local}',
         'description': descr,
         'issuetype': {'name': 'Story'},
@@ -26,5 +31,5 @@ def create_ticket(pfx, sections):
 
 
 def update_ticket(ticket, sections):
-    descr = ''.join([JIRA_SEP + s.get_section() for s in sections])
+    descr = ''.join([_SEP + s.get_section() for s in sections])
     ticket.update(description=descr)

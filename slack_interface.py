@@ -1,9 +1,9 @@
-from settings import SLACK_TOKEN, SLACK_WHOOK
+from settings import SlackSettings
 import requests
 import slack
 import json
 
-client = slack.WebClient(token=SLACK_TOKEN)
+client = slack.WebClient(token=SlackSettings.TOKEN)
 
 
 def _append_relevant(resp, rel_channs):
@@ -80,7 +80,7 @@ def send_msg(*segments):
 
     msg = {"blocks": blocks}
 
-    requests.post(SLACK_WHOOK, data=json.dumps(msg))
+    requests.post(SlackSettings.WHOOK, data=json.dumps(msg))
 
 
 def send_handover_msg(ho_ticket, sections, preface=''):
