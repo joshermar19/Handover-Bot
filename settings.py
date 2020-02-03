@@ -9,10 +9,11 @@ class JiraSettings:
     USER = os.environ.get('JIRA_USER')
     TOKEN = os.environ.get('JIRA_TOKEN')
     URL = 'https://birdco.atlassian.net/'
-    PROJECT = 'NOC'  # Use 'NP' for debug, 'NOC' for production
+    PROJECT = 'NOC'  # Use 'NP' for DEV, 'NOC' for production
 
 
 class SlackSettings:
+    # WHOOK = 'https://hooks.slack.com/services/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'  # For DEV
     WHOOK = os.environ.get('HANDOVER_WHOOK')
     TOKEN = os.environ.get('SLACK_TOKEN')
 
