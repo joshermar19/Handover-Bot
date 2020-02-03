@@ -7,22 +7,16 @@ def scheduler():
     sched = BlockingScheduler()
 
     sched.add_job(
-        mid_handover,
-        'cron',
-        hour='14', minute='30', timezone=TZ)
+        mid_handover, 'cron', hour='14', minute='30', timezone=TZ)
 
     sched.add_job(
-        standup_reminder,
-        'cron',
-        hour='15', timezone=TZ)
+        standup_reminder, 'cron', hour='15', timezone=TZ)
 
     sched.add_job(
-        on_am_handover,
-        'cron', hour='23', minute='30', timezone=TZ)
+        on_am_handover, 'cron', hour='23', minute='30', timezone=TZ)
 
     sched.add_job(
-        on_am_update,
-        'cron', hour='05', minute='30', timezone=TZ)
+        on_am_update, 'cron', hour='05', minute='30', timezone=TZ)
 
     print('Starting jobs scheduler...\n')
 
