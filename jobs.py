@@ -1,6 +1,6 @@
-from jira_interface import create_ticket, update_ticket
-from slack_interface import send_msg, send_handover_msg
-from sections import get_sections
+import jira_interface
+import slack_interface
+import sections
 
 on_am_ticket = None
 
@@ -10,9 +10,9 @@ def mid_handover():
     pfx = "Mid-Shift"
     print(f'Commencing "{pfx}" handover job...')
 
-    sections = get_sections()
-    mid_ticket = create_ticket(pfx, sections)
-    send_handover_msg(mid_ticket, sections)
+    secs = sections.get_sections()
+    mid_ticket = jira_interface.create_ticket(pfx, secs)
+    slack_interface.send_handover_msg(mid_ticket, secs)
 
     print('Job completed')
 
@@ -26,7 +26,7 @@ def standup_reminder():
         '*Howdy! Please commence mid-shift standup.*\n'
         '_Remember to assign and close the handover ticket._\n')
 
-    send_msg(msg)
+    slack_interface.send_msg(msg)
 
     print('Reminder sent')
 
@@ -38,9 +38,9 @@ def on_am_handover():
 
     global on_am_ticket  # This needs to be updated by am handover
 
-    sections = get_sections()
-    on_am_ticket = create_ticket(pfx, sections)
-    send_handover_msg(on_am_ticket, sections)
+    secs = sections.get_sections()
+    on_am_ticket = jira_interface.create_ticket(pfx, secs)
+    slack_interface.send_handover_msg(on_am_ticket, secs)
 
     print('Job completed')
 
@@ -57,10 +57,10 @@ def on_am_update():
 
     print('Commencing update of ON/AM ticket')
 
-    sections = get_sections()
-    update_ticket(on_am_ticket, sections)
+    secs = sections.get_sections()
+    jira_interface.update_ticket(on_am_ticket, secs)
 
-    send_handover_msg(on_am_ticket, sections, preface=PREFACE)
+    slack_interface.send_handover_msg(on_am_ticket, secs, preface=PREFACE)
 
     print('Job completed')
 
@@ -68,7 +68,7 @@ def on_am_update():
 # I expect to use this soon
 def ad_hoc_handover(pfx):
     print(f'Commencing "{pfx}" handover job...')
-    sections = get_sections()
-    ticket = create_ticket(pfx, sections)
-    send_handover_msg(ticket, sections)
+    secs = sections.get_sections()
+    ticket = jira_interface.create_ticket(pfx, secs)
+    slack_interface.send_handover_msg(ticket, secs)
     print('Job completed')
