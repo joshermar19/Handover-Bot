@@ -124,9 +124,9 @@ def get_sections():
             message_if_none='No outstanding P3 incidents.',
         ),
         JiraSection(
-            heading='Outstanding P4-P5 Incidents',
-            query=Queries.P4P5,
-            message_if_none='No outstanding P4-P5 incidents.',
+            heading='Outstanding P4 Incidents',
+            query=Queries.P4,
+            message_if_none='No outstanding P4 incidents.',
         ),
         SlackSection(
             heading='Open NOC Channels',

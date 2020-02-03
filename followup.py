@@ -21,7 +21,7 @@ def _needs_followup(issue, p, t):
         should_followup = (
             p == 2 and time_since > Intervals.P2 or
             p == 3 and time_since > Intervals.P3 or
-            p >= 4 and time_since > Intervals.P4P5
+            p == 4 and time_since > Intervals.P4
         )  # Will either be True or False
 
         return should_followup

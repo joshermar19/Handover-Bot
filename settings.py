@@ -43,7 +43,7 @@ class Queries:
     P1 = f'{_BASE} {_TYPES} AND priority = 1 AND created > "-36h" {_DEF_SORT}'
     P2 = f'{_BASE} {_TYPES} AND priority = 2 AND status != Closed {_DEF_SORT}'
     P3 = f'{_BASE} {_TYPES} AND priority = 3 AND status != Closed {_DEF_SORT}'
-    P4P5 = f'{_BASE} {_TYPES} AND priority < 3 AND status != Closed {_DEF_SORT}'
+    P4 = f'{_BASE} {_TYPES} AND priority = 4 AND status != Closed {_DEF_SORT}'
     ALL = f'{_BASE} {_TYPES} AND status != Closed {_ALL_SORT}'
 
 
@@ -51,4 +51,4 @@ class Intervals:
     '''Followup intervals (seconds)'''
     P2 = 28800     # 4 HRS
     P3 = 86400     # 24 HRS
-    P4P5 = 604800  # 1 Week
+    P4 = 604800    # 1 Week
