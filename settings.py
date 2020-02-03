@@ -2,19 +2,26 @@ from pytz import timezone
 import os
 
 
+DEBUG = False  # "True" uses NP jira project and DEV slack whook
+
+
 TZ = timezone('America/Los_Angeles')
 
 
 class JiraSettings:
+    _DEV_PROJECT = 'NP'
+
     USER = os.environ.get('JIRA_USER')
     TOKEN = os.environ.get('JIRA_TOKEN')
+
     URL = 'https://birdco.atlassian.net/'
-    PROJECT = 'NOC'  # Use 'NP' for DEV, 'NOC' for production
+    PROJECT = _DEV_PROJECT if DEBUG else 'NOC'
 
 
 class SlackSettings:
-    # WHOOK = 'https://hooks.slack.com/services/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'  # For DEV
-    WHOOK = os.environ.get('HANDOVER_WHOOK')
+    _DEV_WHOOK = 'https://hooks.slack.com/services/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'
+
+    WHOOK = _DEV_WHOOK if DEBUG else os.environ.get('HANDOVER_WHOOK')
     TOKEN = os.environ.get('SLACK_TOKEN')
 
 
