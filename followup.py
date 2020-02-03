@@ -10,21 +10,21 @@ def _needs_followup(issue, p, t):
 
         # Simple concept calls for parsimony of var naming I think
         _d = t - last_touched
-        d_secs = _d.total_seconds()
+        time_since = _d.total_seconds()  # SECONDS since ticket was last touched
 
-        # DEBUG
-        print(issue)
-        print(last_touched)
-        print(f'Was {d_secs/3600} hrs ago')
-        print('-----------------')
+        # # DEBUG
+        # print(issue)
+        # print(last_touched)
+        # print(f'Was {time_since/3600} hrs ago')
+        # print('-----------------')
 
         should_followup = (
-            p == 2 and d_secs > Intervals.P2 or
-            p == 3 and d_secs > Intervals.P3 or
-            p >= 4 and d_secs > Intervals.P4P5
-        )
+            p == 2 and time_since > Intervals.P2 or
+            p == 3 and time_since > Intervals.P3 or
+            p >= 4 and time_since > Intervals.P4P5
+        )  # Will either be True or False
 
-        return should_followup  # True/False
+        return should_followup
 
 
 def get_followup_issues():
