@@ -97,7 +97,7 @@ def send_followup_msg(issues):
     msg_segments = [f'@here\nHeads up NOC team!\nPlease follow up on:\n']
 
     followup_items = [
-        f'<{i.permalink()}|*{i.key} — {i.fields.priority.name} — Updated: {i.fields.updated[:19]}*>'
+        f'<{i.permalink()}|*{i.key} — P{i.fields.priority.name} — Updated: {i.fields.updated[:19]}*>'
         for i in issues
     ]
 
