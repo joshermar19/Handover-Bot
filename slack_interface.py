@@ -80,7 +80,8 @@ def send_msg(*segments):
 
     msg = {"blocks": blocks}
 
-    requests.post(SlackSettings.WHOOK, data=json.dumps(msg))
+    response = requests.post(SlackSettings.WHOOK, data=json.dumps(msg))
+    print(response.status_code)
 
 
 def send_handover_msg(ho_ticket, sections, preface=''):
