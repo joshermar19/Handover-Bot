@@ -19,7 +19,7 @@ class JiraSettings:
 class SlackSettings:
     WHOOK = os.environ.get('DEV_WHOOK') if DEBUG else os.environ.get('HANDOVER_WHOOK')
 
-    if WHOOK == None:
+    if WHOOK is None:  # Meaning the environment variable is not set!
         raise Exception('Missing webhook for Slack!')
 
     TOKEN = os.environ.get('SLACK_TOKEN')

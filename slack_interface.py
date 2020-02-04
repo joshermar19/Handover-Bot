@@ -86,13 +86,21 @@ def send_msg(*segments):
 
 def send_handover_msg(ho_ticket, sections, preface=''):
 
-    sections_text = [
-        (
-            f'@here\n'
-            f'{preface}'
-            f'<{ho_ticket.permalink()}|*{ho_ticket.fields.summary}*>'
-        )]
+    msg_segments = [f'@here\n{preface}<{ho_ticket.permalink()}|*{ho_ticket.fields.summary}*>']
 
-    sections_text.extend([s.get_section(for_slack=True) for s in sections])
+    msg_segments.extend([s.get_section(for_slack=True) for s in sections])
 
-    send_msg(*sections_text)
+    send_msg(*msg_segments)
+
+
+def send_followup_msg(issues):
+    msg_segments = [f'@here\nHeads up NOC team!\nPlease follow up on:\n']
+
+    followup_items = [
+        f'<{i.permalink()}|*{i.key} — {i.fields.priority.name} — Updated: {i.fields.updated[:19]}*>'
+        for i in issues
+    ]
+
+    msg_segments.extend(followup_items)
+
+    send_msg(*msg_segments)

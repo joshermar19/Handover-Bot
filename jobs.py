@@ -1,5 +1,6 @@
 import slack_interface
 import jira_interface
+import followup
 import sections
 
 on_am_ticket = None
@@ -63,6 +64,16 @@ def on_am_update():
     slack_interface.send_handover_msg(on_am_ticket, secs, preface=PREFACE)
 
     print('Job completed')
+
+
+def followup_reminder():
+    followup_issues = followup.get_followup_issues()
+
+    if followup_issues:
+        slack_interface.send_followup_msg(followup_issues)
+        print('Sent follow up message')
+    else:
+        print('Nothing to follow up on right now')
 
 
 # I expect to use this soon
