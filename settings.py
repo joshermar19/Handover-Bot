@@ -9,19 +9,15 @@ TZ = timezone('America/Los_Angeles')
 
 
 class JiraSettings:
-    _DEV_PROJECT = 'NP'
-
     USER = os.environ.get('JIRA_USER')
     TOKEN = os.environ.get('JIRA_TOKEN')
 
     URL = 'https://birdco.atlassian.net/'
-    PROJECT = _DEV_PROJECT if DEBUG else 'NOC'
+    PROJECT = 'NP' if DEBUG else 'NOC'
 
 
 class SlackSettings:
-    _DEV_WHOOK = 'https://hooks.slack.com/services/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'
-
-    WHOOK = _DEV_WHOOK if DEBUG else os.environ.get('HANDOVER_WHOOK')
+    WHOOK = os.environ.get('DEV_WHOOK') if DEBUG else os.environ.get('HANDOVER_WHOOK')
     TOKEN = os.environ.get('SLACK_TOKEN')
 
 
