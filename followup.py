@@ -1,6 +1,6 @@
-from datetime import datetime
-from jira_interface import get_tickets
 from settings import TZ, Queries, Intervals
+from datetime import datetime
+import jira_interface
 
 
 def _needs_followup(issue, p, t):
@@ -28,7 +28,7 @@ def _needs_followup(issue, p, t):
 
 
 def get_followup_issues():
-    all_outstanding = get_tickets(Queries.ALL)
+    all_outstanding = jira_interface.get_tickets(Queries.ALL)
     now = datetime.now(TZ)
 
     followup_issues = []

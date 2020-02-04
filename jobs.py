@@ -1,5 +1,5 @@
-import jira_interface
 import slack_interface
+import jira_interface
 import sections
 
 on_am_ticket = None

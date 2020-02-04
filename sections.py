@@ -1,7 +1,7 @@
-from slack_interface import get_open_channels, get_user_name
 from settings import Queries, SectionSettings
-from jira_interface import get_tickets
 from datetime import date
+import slack_interface
+import jira_interface
 
 
 class LineItem():
@@ -51,7 +51,7 @@ class JiraSection(Section):
 
         line_items = []
 
-        for issue in get_tickets(query):
+        for issue in jira_interface.get_tickets(query):
             line_items.append(
                 LineItem(
                     title=issue.key,
@@ -74,11 +74,11 @@ class SlackSection(Section):
 
         line_items = []
 
-        for channel in get_open_channels():
+        for channel in slack_interface.get_open_channels():
             line_items.append(
                 LineItem(
                     title=channel['name'],
-                    user=get_user_name(channel['creator']),
+                    user=slack_interface.get_user_name(channel['creator']),
                     created=str(date.fromtimestamp(channel['created'])),
                     summary=channel['topic']['value'],
                     link=f"{SectionSettings.CHN_URL_BASE}{channel['id']}"))
