@@ -58,7 +58,7 @@ class SecFromJira(Section):
                     priority=issue.fields.priority.name,
                     created=issue.fields.created[:10],
                     updated=issue.fields.updated[:16].replace('T', '_'),
-                    summary=issue.fields.summary[:68],  # Sadly, I don't know where else to limit the len
+                    summary=issue.fields.summary[:80],  # Sadly, I don't know where else to limit the len
                     link=issue.permalink()))
 
         Section.__init__(

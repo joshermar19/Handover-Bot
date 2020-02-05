@@ -24,10 +24,7 @@ def _needs_followup(issue, p, t):
             p == 4 and time_since > Intervals.P4
         )
 
-        # TESTING
-        return True
-
-        # return should_followup
+        return should_followup
 
 
 def get_followup_issues():

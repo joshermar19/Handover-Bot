@@ -82,26 +82,3 @@ def send_msg(*segments):
 
     response = requests.post(SlackSettings.WHOOK, data=json.dumps(msg))
     print(response.status_code)
-
-
-# This should be recycled. Can be used by reminder with little modification:
-def send_handover_msg(ho_ticket, sections, preface=''):
-
-    msg_segments = [f'@here\n{preface}<{ho_ticket.permalink()}|*{ho_ticket.fields.summary}*>']
-
-    msg_segments.extend([s.get_section(for_slack=True) for s in sections])
-
-    send_msg(*msg_segments)
-
-
-# def send_followup_msg(issues):
-#     msg_segments = [f'@here\nPlease follow up on:\n']
-
-#     followup_items = [
-#         (
-#         ) for i in issues
-#     ]
-
-#     msg_segments.extend(followup_items)
-
-#     send_msg(*msg_segments)
