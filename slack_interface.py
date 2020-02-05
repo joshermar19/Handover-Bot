@@ -84,6 +84,7 @@ def send_msg(*segments):
     print(response.status_code)
 
 
+# This should be recycled. Can be used by reminder with little modification:
 def send_handover_msg(ho_ticket, sections, preface=''):
 
     msg_segments = [f'@here\n{preface}<{ho_ticket.permalink()}|*{ho_ticket.fields.summary}*>']
@@ -93,14 +94,14 @@ def send_handover_msg(ho_ticket, sections, preface=''):
     send_msg(*msg_segments)
 
 
-def send_followup_msg(issues):
-    msg_segments = [f'@here\nHeads up NOC team!\nPlease follow up on:\n']
+# def send_followup_msg(issues):
+#     msg_segments = [f'@here\nPlease follow up on:\n']
 
-    followup_items = [
-        f'<{i.permalink()}|*{i.key} — P{i.fields.priority.name} — Updated: {i.fields.updated[:19]}*>'
-        for i in issues
-    ]
+#     followup_items = [
+#         (
+#         ) for i in issues
+#     ]
 
-    msg_segments.extend(followup_items)
+#     msg_segments.extend(followup_items)
 
-    send_msg(*msg_segments)
+#     send_msg(*msg_segments)

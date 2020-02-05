@@ -2,7 +2,7 @@ from pytz import timezone
 import os
 
 
-DEBUG = False  # "True" uses NP jira project and DEV slack whook
+DEBUG = 1  # "True" uses NP jira project and DEV slack whook
 
 
 TZ = timezone('America/Los_Angeles')
@@ -26,25 +26,23 @@ class SlackSettings:
 
 
 class SectionSettings:
+    SHORT_BASE = '*{key} — Created: {created}*'
+    LONG_BASE = '*{key} — P{priority} — Last update: {updated}*'
     MAX_SUM_LEN = 70
     CHN_URL_BASE = 'https://birdrides.slack.com/archives/'
 
 
 class Queries:
     # Macros
-    _BASE = 'project = NOC AND'
+    _BASE = 'project = NOC AND'  # Project needs to be "NOC" for production!
     _DEF_SORT = 'ORDER BY key DESC'
-    _ALL_SORT = 'ORDER by priority DESC, key DESC'
     _TYPES = '(type = Incident or type = "Platform Partner Outage")'
 
     # JQL queries used to populate issue sections
     HO = f'{_BASE} type = Story AND summary ~ "NOC Handover" AND status != Done {_DEF_SORT}'
     CR = f'{_BASE} type = "Change Record" AND created > "-24h" {_DEF_SORT}'
     P1 = f'{_BASE} {_TYPES} AND priority = 1 AND created > "-36h" {_DEF_SORT}'
-    P2 = f'{_BASE} {_TYPES} AND priority = 2 AND status != Closed {_DEF_SORT}'
-    P3 = f'{_BASE} {_TYPES} AND priority = 3 AND status != Closed {_DEF_SORT}'
-    P4 = f'{_BASE} {_TYPES} AND priority = 4 AND status != Closed {_DEF_SORT}'
-    ALL = f'{_BASE} {_TYPES} AND status != Closed {_ALL_SORT}'
+    OPEN_ISSUES = f'{_BASE} {_TYPES} AND status != Closed ORDER by priority DESC, key DESC'
 
 
 class Intervals:

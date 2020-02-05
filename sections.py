@@ -2,132 +2,141 @@ from settings import Queries, SectionSettings
 from datetime import date
 import slack_interface
 import jira_interface
+import followup
 
 
 class LineItem():
-    def __init__(self, title, user, created, summary, link):
-        self.summary = summary[:SectionSettings.MAX_SUM_LEN]
-        self.link = link
-        self.base_title = f'*{title} — {user} — {created[:10]}*'
+    def __init__(self, **fields):
+        self.fields = fields
 
-    def jira_line_title(self):
-        return self.base_title
+    # These methods return the base with any vars expanded from the item itself
+    def jira_line_title(self, base):
+        return base.format(**self.fields)
 
-    def slack_line_title(self):
-        return f'<{self.link}|{self.base_title}>'  # This one includes a Slack formatted hyperlink
+    def slack_line_title(self, base):
+        return f'<{self.fields["link"]}|{base.format(**self.fields)}>'
+        # f'<{self.fields['link']}|{self.base_title}>'  # This one includes a Slack formatted hyperlink
 
 
 class Section():
-    def __init__(self, heading, line_items, message_if_none, show_count, no_summaries):
+    def __init__(self, heading, line_items, base, message_if_none, show_count):
         self.heading = heading
         self.line_items = line_items
+        self.base = base
         self.message_if_none = message_if_none
         self.show_count = show_count
-        self.no_summaries = no_summaries
 
         print(f'Populated section for "{self.heading}"')
 
     def get_section(self, for_slack=False):
         title_count = f' ({len(self.line_items)})' if self.show_count else ''
-        section_items = [f'*{self.heading}{title_count}:*\n\n']
+
+        section_items = []
+
+        if self.heading:
+            section_items.append(f'*{self.heading}{title_count}:*\n\n')
 
         if not self.line_items:
             section_items.append(f'_{self.message_if_none}_\n')
         else:
             for li in self.line_items:
-                title = li.slack_line_title() if for_slack else li.jira_line_title()
-                section_items.append(f'{title}\n')
-
-                # This is useful for channels, as currently they should not have a summary
-                if not self.no_summaries:
-                    section_items.append(f'{li.summary}\n\n')
+                title = li.slack_line_title(self.base) if for_slack else li.jira_line_title(self.base)
+                section_items.append(f'{title}\n{li.fields["summary"]}\n')
 
         return ''.join(section_items)
 
 
-class JiraSection(Section):
-
-    def __init__(self, heading, query, message_if_none, show_count=True, no_summaries=False):
+class SecFromJira(Section):
+    def __init__(self, heading, issues, base, message_if_none='', show_count=True):
 
         line_items = []
 
-        for issue in jira_interface.get_tickets(query):
+        for issue in issues:
             line_items.append(
                 LineItem(
-                    title=issue.key,
-                    user=getattr(issue.fields.assignee, 'name', 'unassigned'),
-                    created=issue.fields.created,
-                    summary=issue.fields.summary,
+                    key=issue.key,
+                    priority=issue.fields.priority.name,
+                    created=issue.fields.created[:10],
+                    updated=issue.fields.updated[:16].replace('T', '_'),
+                    summary=issue.fields.summary[:68],  # Sadly, I don't know where else to limit the len
                     link=issue.permalink()))
 
         Section.__init__(
             self,
             heading=heading,
             line_items=line_items,
+            base=base,
             message_if_none=message_if_none,
-            show_count=show_count,
-            no_summaries=no_summaries)
+            show_count=show_count)
 
 
-class SlackSection(Section):
-    def __init__(self, heading, message_if_none='', show_count=True, no_summaries=True):
+class SecFromSlack(Section):
+    def __init__(self, heading, base, message_if_none='', show_count=True):
 
         line_items = []
 
         for channel in slack_interface.get_open_channels():
             line_items.append(
                 LineItem(
-                    title=channel['name'],
-                    user=slack_interface.get_user_name(channel['creator']),
+                    key=channel['name'],
+                    # user=slack_interface.get_user_name(channel['creator']),
                     created=str(date.fromtimestamp(channel['created'])),
-                    summary=channel['topic']['value'],
+                    summary=channel['topic']['value'][:70],
                     link=f"{SectionSettings.CHN_URL_BASE}{channel['id']}"))
 
         Section.__init__(
             self,
             heading=heading,
             line_items=line_items,
+            base=base,
             message_if_none=message_if_none,
-            show_count=show_count,
-            no_summaries=no_summaries)
+            show_count=show_count)
 
 
 # The following function defines the totality of sections and the order in which they will appear
 def get_sections():
     return [
-        JiraSection(
+        SecFromJira(
             heading='Open Handover Issues',
-            query=Queries.HO,
+            issues=jira_interface.get_tickets(Queries.HO),
             message_if_none='No open handover issues.',
+            base=SectionSettings.SHORT_BASE,
             show_count=False
         ),
-        JiraSection(
+        SecFromJira(
             heading='Recent Change Records (-24hrs, any status)',
-            query=Queries.CR,
+            issues=jira_interface.get_tickets(Queries.CR),
             message_if_none='No recent CR issues.',
+            base=SectionSettings.SHORT_BASE,
             show_count=False
         ),
-        JiraSection(
+        SecFromJira(
             heading='Recent Outages (-36hrs, any status)',
-            query=Queries.P1,
+            issues=jira_interface.get_tickets(Queries.P1),
             message_if_none='No recent outages (knock on wood).',
+            base=SectionSettings.LONG_BASE,
             show_count=False
         ),
-        JiraSection(
-            heading='Outstanding P2 Incidents',
-            query=Queries.P2,
-            message_if_none='No outstanding P2 incidents.',
+        SecFromJira(
+            heading='Outstanding Incidents',
+            issues=jira_interface.get_tickets(Queries.OPEN_ISSUES),
+            message_if_none='No outstanding incidents. Woohoo!',
+            base=SectionSettings.LONG_BASE,
         ),
-        JiraSection(
-            heading='Outstanding P3 Incidents',
-            query=Queries.P3,
-            message_if_none='No outstanding P3 incidents.',
-        ),
-        JiraSection(
-            heading='Outstanding P4 Incidents',
-            query=Queries.P4,
-            message_if_none='No outstanding P4 incidents.',
-        ),
-        SlackSection(
+        SecFromSlack(
             heading='Open NOC Channels',
+            base=SectionSettings.SHORT_BASE,
         )]
+
+
+def get_followup_section():
+    followup_issues = followup.get_followup_issues()
+
+    if not followup_issues:
+        return None
+
+    return SecFromJira(
+        heading='',
+        issues=followup_issues,
+        base=SectionSettings.LONG_BASE,
+        show_count=False)

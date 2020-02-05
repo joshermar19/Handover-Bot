@@ -1,6 +1,5 @@
 import slack_interface
 import jira_interface
-import followup
 import sections
 
 on_am_ticket = None
@@ -67,13 +66,18 @@ def on_am_update():
 
 
 def followup_reminder():
-    followup_issues = followup.get_followup_issues()
+    HEADING = f'@here\n*Heads up team! Show the following issues some love:*\n\n'
 
-    if followup_issues:
-        slack_interface.send_followup_msg(followup_issues)
-        print('Sent follow up message')
-    else:
-        print('Nothing to follow up on right now')
+    followup_section = sections.get_followup_section()
+
+    if not followup_reminder:
+        return
+
+    msg = HEADING + followup_section.get_section(for_slack=True)
+
+    print(followup_section.get_section(for_slack=True))
+
+    slack_interface.send_msg(msg)
 
 
 # I expect to use this soon
