@@ -2,7 +2,7 @@ from pytz import timezone
 import os
 
 
-DEBUG = 1  # "True" uses NP jira project and DEV slack whook
+DEBUG = True  # "True" uses NP jira project and DEV slack whook
 
 
 TZ = timezone('America/Los_Angeles')

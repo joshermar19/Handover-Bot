@@ -12,12 +12,6 @@ def _needs_followup(issue, p, t):
         _d = t - last_touched
         time_since = _d.total_seconds()  # SECONDS since ticket was last touched
 
-        # # DEBUG
-        # print(issue)
-        # print(last_touched)
-        # print(f'Was {time_since/3600} hrs ago')
-        # print('-----------------')
-
         should_followup = (  # Will either be True or False
             p == 2 and time_since > Intervals.P2 or
             p == 3 and time_since > Intervals.P3 or
