@@ -1,39 +1,31 @@
 from flask import Flask, jsonify, request
+from slack_interface import client, msg_builder
+from settings import NOCStatSettings
+from threading import Thread
+import sections
 import hashlib
-import slack
 import hmac
-import os
 
 
-OAUTH_TOKEN = os.environ['SLACK_DEV_TOKEN']
-SIGN_SECRET = os.environ['SLACK_SIGN_SECRET'].encode('ascii')  # MUST BE ASCII ¯\_(ツ)_/¯
-AUTHORIZED_USERS = ['joshermar']
-
-VIEW = {
+INTRO_VIEW = {
     "type": "modal",
     "title": {
         "type": "plain_text",
         "text": "Open NOC Issues",
-        "emoji": True
-    },
-    "close": {
-        "type": "plain_text",
-        "text": "Close",
-        "emoji": True
     },
     "blocks": [
         {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "This is a mrkdwn section block :ghost: *this is bold*, and ~this is crossed out~, and <https://google.com|this is a link>"
+                "text": "One moment while I cook that up for you..."
             }
         }
     ]
 }
 
 
-client = slack.WebClient(token=OAUTH_TOKEN)
+response = None
 
 app = Flask(__name__)
 
@@ -43,7 +35,7 @@ def _verify_signature(request):
     timestamp = request.headers['X-Slack-Request-Timestamp']
 
     base = f'v0:{timestamp}:{body}'.encode('utf-8')  # Apparently this needs to be ASCII
-    computed_sig = f'v0={hmac.new(SIGN_SECRET, base, digestmod=hashlib.sha256).hexdigest()}'
+    computed_sig = f'v0={hmac.new(NOCStatSettings.SIGN_SECRET, base, digestmod=hashlib.sha256).hexdigest()}'
 
     # # DEBUG
     # print(computed_sig)
@@ -52,8 +44,51 @@ def _verify_signature(request):
     return computed_sig == request.headers['X-Slack-Signature']
 
 
-@app.route('/issues', methods=['POST'])
-def issues():
+def get_ho_view():
+    all_sections = sections.get_sections()
+    segments = [s.get_section(for_slack=True) for s in all_sections]
+
+    # Just a reminder, this functions returns the smallest number of preformated
+    # slack "blocks" that conform to the character limit for "text" field
+    blocks = msg_builder(*segments)  # Remember, each "segment" is a separate argument
+
+    view = {
+        "type": "modal",
+        "title": {
+            "type": "plain_text",
+            "text": "Open NOC Issues",
+            "emoji": True
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "Close",
+            "emoji": True
+        },
+        "blocks": blocks
+    }
+
+    return view
+
+
+def initial_view(tid, view):
+    global response  # A more elegant OO approach would be desireable
+    response = client.views_open(trigger_id=tid, view=view)
+    print('END of initial view')
+
+
+def final_view():
+    # This has to happen asyncronously
+    vid = response.data['view']['id']  # This has to have been updated by now
+
+    view = get_ho_view()  # Crux of the I/O bind
+
+    client.views_update(view=view, view_id=vid)
+    print('END of final view')
+
+
+@app.route('/noc-status', methods=['POST'])
+def noc_status():
+    print('Start of Route')
 
     # Check for correct signing secret
     if not _verify_signature(request):
@@ -61,18 +96,21 @@ def issues():
 
     # Check for user authorization
     user_name = request.form['user_name']
-    if user_name not in AUTHORIZED_USERS:
+    if user_name not in NOCStatSettings.AUTHORIZED_USERS:
         return jsonify({'text': f'User {user_name} is not authorized to do that ;('})
 
-    tid = request.form['trigger_id']
-    print('Using tid: ', tid)
+    initial_view(request.form['trigger_id'], INTRO_VIEW)
 
-    client.views_open(trigger_id=request.form['trigger_id'], view=VIEW)
+    # initial_view_thread = Thread(target=initial_view, args=(request.form['trigger_id'], INTRO_VIEW))
+    final_view_thread = Thread(target=final_view)
 
-    # This only happens if above checks do not fail
-    return jsonify({'text': 'Returned'})
+    final_view_thread.start()
+
+    print('END of Route')
+
+    # Obviously only happens if above checks do not fail
+    return ('', 200)
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-

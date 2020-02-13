@@ -22,7 +22,7 @@ class SlackSettings:
     if WHOOK is None:  # Meaning the environment variable is not set!
         raise Exception('Missing webhook for Slack!')
 
-    TOKEN = os.environ.get('SLACK_TOKEN')
+    TOKEN = os.environ['SLACK_DEV_TOKEN'] if DEBUG else os.environ.get('SLACK_TOKEN')
 
 
 class SectionSettings:
@@ -50,3 +50,8 @@ class Intervals:
     P2 = 28800     # 4 HRS
     P3 = 86400     # 24 HRS
     P4 = 604800    # 1 Week
+
+
+class NOCStatSettings:
+    SIGN_SECRET = os.environ['SLACK_SIGN_SECRET'].encode('ascii')  # MUST BE ASCII ¯\_(ツ)_/¯
+    AUTHORIZED_USERS = ['josh.martinez']

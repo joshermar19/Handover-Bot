@@ -48,7 +48,7 @@ def _txt_block(text):
     }
 
 
-def _block_builder(section):
+def block_builder(section):
     blocks = []
     block_lines = []
 
@@ -68,17 +68,21 @@ def _block_builder(section):
     return blocks
 
 
-def send_msg(*segments):
-    """Accepts any number of message segments"""
+def msg_builder(*segments):
     blocks = []
 
     for segment in segments:
-        blocks.extend(_block_builder(segment))
+        blocks.extend(block_builder(segment))
 
         if segment != segments[-1]:  # Don't add line for last (or only) segment
             blocks.append({"type": "divider"})
+    return blocks
 
-    msg = {"blocks": blocks}
+
+def send_msg(*segments):
+    """Accepts any number of message segments"""
+
+    msg = {"blocks": msg_builder(*segments)}
 
     response = requests.post(SlackSettings.WHOOK, data=json.dumps(msg))
     print(response.status_code)
