@@ -1,6 +1,5 @@
-from settings import TZ, Queries, Intervals
+from settings import TZ, Intervals
 from datetime import datetime
-import jira_interface
 
 
 def _needs_followup(issue, p, t):
@@ -21,12 +20,11 @@ def _needs_followup(issue, p, t):
         return should_followup
 
 
-def get_followup_issues():
-    all_outstanding = jira_interface.get_tickets(Queries.OPEN_ISSUES)
+def filter_followup(issues):
     now = datetime.now(TZ)
 
     followup_issues = []
-    for issue in all_outstanding:
+    for issue in issues:
         priority = int(issue.fields.priority.id)
 
         if _needs_followup(issue, priority, now):
