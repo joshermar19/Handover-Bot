@@ -6,32 +6,21 @@ import json
 client = slack.WebClient(token=SlackSettings.TOKEN)
 
 
-def _chan_is_relevant(chan):
+def _chan_is_relevant(c, archived):
     keywords = ('issue', 'noc')
-    return all(kw in chan['name'] for kw in keywords)
+    kw_test = all(kw in c['name'] for kw in keywords)
+    arch_test = c['is_archived'] if archived else not c['is_archived']
+    return all((kw_test, arch_test))
 
 
-def _filter_open_noc(channels):
-    # For each "resp", chech for relevant channels and append them to my list
-    return (c for c in channels if not c['is_archived'] and _chan_is_relevant(c))
-
-
-def _filter_arch_noc(channels):
-    # For each "resp", chech for relevant channels and append them to my list
-    return (c for c in channels if c['is_archived'] and _chan_is_relevant(c))
-
-
-def get_channels(archived):  # USEEEEEEEE
+def get_channels(archived):
     relevant_channels = []
 
     cursor = ''  # Think I tried using None/null and it didn't like that
     while True:  # This has to run with a empty cursor the first time
         response = client.channels_list(cursor=cursor)
 
-        # Easy peasy. Just select the relevant filter func acording to value of archived
-        chan_filter = _filter_arch_noc if archived else _filter_open_noc
-
-        filtered_page = chan_filter(response['channels'])
+        filtered_page = (c for c in response['channels'] if _chan_is_relevant(c, archived))
         relevant_channels.extend(filtered_page)
 
         cursor = response['response_metadata']['next_cursor']
@@ -43,11 +32,7 @@ def get_channels(archived):  # USEEEEEEEE
     return relevant_channels
 
 
-def get_open_channels():
-    """Just a wrapper function as a stopgap. Eventually I just have to rewrite calls to use get_channels"""
-    return get_channels(archived=False)
-
-
+# Unused. Will prob remove eventually.
 def get_user_name(usr):
     response = client.users_info(user=usr)
     return response['user']['name']
