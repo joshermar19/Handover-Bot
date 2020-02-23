@@ -28,20 +28,27 @@ class Section():
 
         print(f'Populated section for "{self.heading}"')
 
-    def get_section(self, for_slack=False):  # THIIIIIIIIISSSSSSSSSS IS WHERE u need to limit the length of summaries
+    def get_section(self, for_slack=False, max_len=85):
         title_count = f' ({len(self.line_items)})' if self.show_count else ''
 
         section_items = []
 
         if self.heading:
-            section_items.append(f'*{self.heading}{title_count}:*\n\n')
+            section_items.append(f'*{self.heading}{title_count}:*')
 
-        if not self.line_items:
-            section_items.append(f'_{self.message_if_none}_\n')
+        section_items.append('\n\n')
+
+        if not self.line_items and self.message_if_none:
+            section_items.append(f'_{self.message_if_none}_')
+            section_items.append('\n')
+
         else:
             for li in self.line_items:
-                title = li.slack_line_title(self.line_fmt) if for_slack else li.jira_line_title(self.line_fmt)
-                section_items.append(f'{title}\n{li.fields["summary"]}\n\n')
+                item_title = li.slack_line_title(self.line_fmt) if for_slack else li.jira_line_title(self.line_fmt)
+                section_items.append(item_title)
+                section_items.append('\n')
+                section_items.append(li.fields["summary"][:max_len])
+                section_items.append('\n\n')
 
         return ''.join(section_items)
 

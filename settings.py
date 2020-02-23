@@ -58,19 +58,19 @@ class NOCStatSettings:
 
 
 # Macros for queries bellow
-_BASE = 'project = NOC AND'  # Project needs to be "NOC" for production!
 _DEF_SORT = 'ORDER BY key DESC'
 _TYPES = '(type = Incident or type = "Platform Partner Outage")'
 
 # JQL queries used to populate issue sections
-_HO = f'{_BASE} type = Story AND summary ~ "NOC Handover" AND status != Done {_DEF_SORT}'
-_CR = f'{_BASE} type = "Change Record" AND created > "-24h" {_DEF_SORT}'
-_P1 = f'{_BASE} {_TYPES} AND priority = 1 AND created > "-36h" {_DEF_SORT}'
-_OPEN_ISSUES = f'{_BASE} {_TYPES} AND status != Closed ORDER by priority DESC, key DESC'
+_HO = f'project = NOC AND type = Story AND summary ~ "NOC Handover" AND status != Done {_DEF_SORT}'
+_CR = f'project = NOC AND type = "Change Record" AND created > "-24h" {_DEF_SORT}'
+_P1 = f'project = NOC AND {_TYPES} AND priority = 1 AND created > "-36h" {_DEF_SORT}'
+_OPEN_ISSUES = f'project = NOC AND {_TYPES} AND status != Closed ORDER by priority DESC, key DESC'
 
 
-_SHORT_BASE = '*{key} — Created: {created}*'  # EVENTUALLY MOVE OUT OF HERE
-_LONG_BASE = '*{key} — P{priority} — Last update: {updated}*'  # SAME
+# Formats used by line titles
+_SHORT_FMT = '*{key} — Created: {created}*'
+_LONG_FMT = '*{key} — P{priority} — Last update: {updated}*'
 
 
 COMPONENTS = {
@@ -80,7 +80,7 @@ COMPONENTS = {
             "heading": "Open Handover Issues",
             "query": _HO,
             "message_if_none": "No open handover issues.",
-            "line_fmt": _SHORT_BASE,
+            "line_fmt": _SHORT_FMT,
         }
     },
     "recent_cr_issues": {
@@ -89,7 +89,7 @@ COMPONENTS = {
             "heading": "Recent Change Records (-24hrs, any status)",
             "query": _CR,
             "message_if_none": "No recent CR issues.",
-            "line_fmt": _SHORT_BASE,
+            "line_fmt": _SHORT_FMT,
         }
     },
     "recent_outages": {
@@ -98,7 +98,7 @@ COMPONENTS = {
             "heading": "Recent Outages (-36hrs, any status)",
             "query": _P1,
             "message_if_none": "No recent outages (knock on wood).",
-            "line_fmt": _LONG_BASE,
+            "line_fmt": _LONG_FMT,
         }
     },
     "outstanding_incidents": {
@@ -107,7 +107,7 @@ COMPONENTS = {
             "heading": "Outstanding Incidents",
             "query": _OPEN_ISSUES,
             "message_if_none": "No outstanding incidents. Woohoo!",
-            "line_fmt": _LONG_BASE,
+            "line_fmt": _LONG_FMT,
             "show_count": True,
         }
     },
@@ -115,7 +115,7 @@ COMPONENTS = {
         "from_jira": False,
         "kwargs": {
             "heading": "Open NOC Channels",
-            "line_fmt": _SHORT_BASE,
+            "line_fmt": _SHORT_FMT,
             "show_count": True,
         }
     },
@@ -125,7 +125,7 @@ COMPONENTS = {
             "heading": "Issues that need to be followed up on",
             "query": _OPEN_ISSUES,
             "message_if_none": "No pressing issues to follow up on. Good job!",
-            "line_fmt": _LONG_BASE,
+            "line_fmt": _LONG_FMT,
             "show_count": True,
             "only_followup": True,
         }
@@ -134,7 +134,7 @@ COMPONENTS = {
         "from_jira": False,
         "kwargs": {
             "heading": "Archived NOC Channels",
-            "line_fmt": _SHORT_BASE,
+            "line_fmt": _SHORT_FMT,
             "archived": True,
             "show_count": False,
         }

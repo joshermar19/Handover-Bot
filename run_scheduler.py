@@ -8,13 +8,13 @@ def scheduler():
 
     # Handover Jobs + reminder:
     sched.add_job(
-        jobs.on_am_update, 'cron', hour='05', minute='30', timezone=TZ)
+        jobs.am_update, 'cron', hour='05', minute='30', timezone=TZ)
     sched.add_job(
         jobs.mid_handover, 'cron', hour='14', minute='30', timezone=TZ)
     sched.add_job(
         jobs.standup_reminder, 'cron', hour='15', timezone=TZ)
     sched.add_job(
-        jobs.on_am_handover, 'cron', hour='23', minute='30', timezone=TZ)
+        jobs.on_handover, 'cron', hour='23', minute='30', timezone=TZ)
 
     # Followup reminder jobs:
     # sched.add_job(
