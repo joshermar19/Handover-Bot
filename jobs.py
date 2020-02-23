@@ -41,14 +41,14 @@ def mid_handover():
 
 
 def on_handover():
-    PFX = "Overnight/Morning"
+    PFX = "Overnight"
     new_handover(PFX)
 
 
 def am_update():
     PREFACE = (
         '*Good morning team!*\n'
-        '_ON/AM handover ticket has been updated to include any overnight issues._\n\n')
+        '_Overnight handover ticket has been updated to include any new issues._\n\n')
     update_handover(PREFACE)
 
 
@@ -58,7 +58,7 @@ def standup_reminder():
     msg = (
         '@here\n'
         '\n'
-        '*Howdy! Please commence mid-shift standup.*\n'
+        '*Please commence mid-shift standup.*\n'
         '_Remember to assign and close the handover ticket._\n')
 
     slack_interface.send_msg(msg)
