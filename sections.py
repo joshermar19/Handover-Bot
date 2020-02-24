@@ -15,7 +15,6 @@ class LineItem():
 
     def slack_line_title(self, line_fmt):
         return f'<{self.fields["link"]}|{line_fmt.format(**self.fields)}>'
-        # f'<{self.fields['link']}|{self.base_title}>'  # This one includes a Slack formatted hyperlink
 
 
 class Section():

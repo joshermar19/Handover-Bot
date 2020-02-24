@@ -89,7 +89,7 @@ def interm_view(vid):
 
 def final_view(vid, selection):
     _secs = sections.get_sections(selection)
-    segments = [s.get_section(for_slack=True) for s in _secs]
+    segments = [s.get_section(for_slack=True, max_len=200) for s in _secs]
 
     blocks = msg_builder(*segments)
     view = OnDemandView(blocks)
